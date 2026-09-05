@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from backend.core.clock import utc_now
 from backend.core.exceptions import ExportBlockedError, ValidationError
-from backend.core.paths import project_assets_dir, project_export_dir
+from backend.core.paths import project_assets_dir, project_export_dir, project_snapshot_dir
 from backend.core.schema_version import CURRENT_SCHEMA_VERSION
 from backend.domain.export_rules import (
     PACKAGE_SECTION_FILES,
@@ -27,7 +27,7 @@ from backend.schemas.asset import CharacterPresentationWrite, ModelAssetWrite, R
 from backend.schemas.character import CharacterCreate, PersonalityTagRead
 from backend.schemas.city import CityWrite
 from backend.schemas.event import EventFactionWrite, EventParticipantWrite, EventSourceWrite, EventWrite
-from backend.schemas.export import ExportManifest, ExportPackage, ExportResult
+from backend.schemas.export import ExportManifest, ExportPackage, ExportResult, SnapshotResult
 from backend.schemas.faction import FactionMemberWrite, FactionTerritoryWrite, FactionWrite
 from backend.schemas.map import MapCityPlace, MapFeatureWrite, MapWrite, TerrainCellPatch, TerrainPatchWrite
 from backend.schemas.personality import PersonalityTagCreate
@@ -132,6 +132,18 @@ class ExportService:
         package = await self._build_package(project, mode)
         export_dir = self._write_files(project.id, project.content_version, package)
         return ExportResult(export_dir=str(export_dir), package=package)
+
+    async def save_snapshot(self, project_id: str) -> SnapshotResult:
+        """把工作库写成可再次打开的项目包。不跑导出校验。"""
+        project = await self._projects.get(project_id)
+        package = await self._build_package(project, ValidationMode.GAME_NARRATIVE)
+        snapshot_dir = self._write_package_dir(project_snapshot_dir(project.id), package)
+        return SnapshotResult(snapshot_dir=str(snapshot_dir), package=package)
+
+    async def open_snapshot(self, snapshot_dir: str) -> ProjectRead:
+        """从项目包目录导入为新项目。"""
+        package = self._read_package_dir(Path(snapshot_dir))
+        return await self.import_package(package)
 
     async def import_package(self, package: ExportPackage) -> ProjectRead:
         """校验 schema 与 checksum 后导入为新项目。实体 ID 重新生成。"""
@@ -249,7 +261,9 @@ class ExportService:
         return dumped
 
     def _write_files(self, project_id: str, content_version: int, package: ExportPackage) -> Path:
-        root = project_export_dir(project_id, content_version)
+        return self._write_package_dir(project_export_dir(project_id, content_version), package)
+
+    def _write_package_dir(self, root: Path, package: ExportPackage) -> Path:
         root.mkdir(parents=True, exist_ok=True)
         for name, payload in package.section_payloads().items():
             (root / name).write_text(
@@ -261,6 +275,36 @@ class ExportService:
             encoding="utf-8",
         )
         return root
+
+    def _read_package_dir(self, root: Path) -> ExportPackage:
+        if not root.is_dir():
+            raise ValidationError("项目包目录不存在", field="snapshot_dir")
+        manifest_path = root / "manifest.json"
+        if not manifest_path.is_file():
+            raise ValidationError("项目包缺少 manifest.json", field="snapshot_dir")
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        sections: dict[str, Any] = {}
+        for name in PACKAGE_SECTION_FILES:
+            path = root / name
+            if not path.is_file():
+                raise ValidationError(f"项目包缺少 {name}", field="snapshot_dir")
+            sections[name] = json.loads(path.read_text(encoding="utf-8"))
+        return ExportPackage(
+            manifest=ExportManifest.model_validate(manifest),
+            project=sections["project.json"],
+            personality_tags=sections["personality_tags.json"],
+            sources=sections["sources.json"],
+            characters=sections["characters.json"],
+            relationships=sections["relationships.json"],
+            skills=sections["skills.json"],
+            character_skills=sections["character_skills.json"],
+            maps=sections["maps.json"],
+            cities=sections["cities.json"],
+            factions=sections["factions.json"],
+            events=sections["events.json"],
+            stories=sections["stories.json"],
+            resources=sections["resources.json"],
+        )
 
     async def _import_project(self, section: dict[str, Any]) -> ProjectRead:
         name = str(section.get("name") or "").strip()

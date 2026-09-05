@@ -18,6 +18,13 @@ class SourceCreate(BaseModel):
         return value.strip().lower()
 
 
+class SourceUpdate(BaseModel):
+    """更新自定义来源。code 不可改。"""
+
+    name: str = Field(min_length=1, max_length=100)
+    source_type: SourceType
+
+
 class SourceRead(BaseModel):
     """来源目录条目。"""
 

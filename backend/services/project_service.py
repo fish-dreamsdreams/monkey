@@ -3,9 +3,12 @@
 职责：创建/更新内容项目、写入预置性格标签，并保证项目上下文字段稳定。
 """
 
+import shutil
+
 from backend.core.clock import utc_now
 from backend.core.exceptions import ConflictError, NotFoundError
 from backend.core.ids import EntityPrefix, new_business_code, new_id
+from backend.core.paths import project_root_dir
 from backend.core.schema_version import CURRENT_SCHEMA_VERSION
 from backend.domain.character_rules import validate_historical_year_range
 from backend.domain.personality import SYSTEM_PERSONALITY_TAGS
@@ -15,7 +18,7 @@ from backend.models.project import Project
 from backend.models.source import Source
 from backend.repositories.project_repository import ProjectRepository
 from backend.repositories.source_repository import SourceRepository
-from backend.schemas.personality import PersonalityTagCreate
+from backend.schemas.personality import PersonalityTagCreate, PersonalityTagUpdate
 from backend.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
 
 
@@ -113,6 +116,48 @@ class ProjectService:
             is_system=False,
         )
         await self._projects.add_tags([tag])
+        project = await self._projects.get(project_id)
+        if project is not None:
+            await self._projects.bump_content_version(project)
+        return tag
+
+    async def update_personality_tag(
+        self,
+        project_id: str,
+        tag_id: str,
+        payload: PersonalityTagUpdate,
+    ) -> PersonalityTag:
+        """更新性格标签名称与说明。code 与系统标记不可改。"""
+        tag = await self._require_tag(project_id, tag_id)
+        tag.name = payload.name.strip()
+        tag.description = payload.description
+        project = await self._require_project(project_id)
+        await self._projects.bump_content_version(project)
+        return tag
+
+    async def delete_personality_tag(self, project_id: str, tag_id: str) -> None:
+        """删除自定义性格标签。系统预置标签不可删。"""
+        tag = await self._require_tag(project_id, tag_id)
+        if tag.is_system:
+            raise ConflictError("系统预置性格标签不能删除")
+        await self._projects.delete_tag(tag)
+        project = await self._projects.get(project_id)
+        if project is not None:
+            await self._projects.bump_content_version(project)
+
+    async def delete(self, project_id: str) -> None:
+        """删除项目及其工作区文件。"""
+        project = await self._require_project(project_id)
+        await self._projects.delete_project(project)
+        root = project_root_dir(project_id)
+        if root.exists():
+            shutil.rmtree(root, ignore_errors=True)
+
+    async def _require_tag(self, project_id: str, tag_id: str) -> PersonalityTag:
+        await self._require_project(project_id)
+        tag = await self._projects.get_tag(project_id, tag_id)
+        if tag is None:
+            raise NotFoundError("性格标签不存在")
         return tag
 
     async def _require_project(self, project_id: str) -> Project:

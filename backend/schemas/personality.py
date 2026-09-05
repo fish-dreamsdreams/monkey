@@ -14,3 +14,10 @@ class PersonalityTagCreate(BaseModel):
     @classmethod
     def normalize_code(cls, value: str) -> str:
         return value.strip().lower()
+
+
+class PersonalityTagUpdate(BaseModel):
+    """更新性格标签。code 不可改。"""
+
+    name: str = Field(min_length=1, max_length=50)
+    description: str | None = Field(default=None, max_length=200)

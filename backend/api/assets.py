@@ -1,6 +1,6 @@
 """资源 API。只登记元数据与相对路径，不渲染预览。"""
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 
 from backend.api.context import (
     ProjectContext,
@@ -20,6 +20,7 @@ from backend.schemas.asset import (
     ResourceRef,
     ResourceWrite,
 )
+from backend.domain.asset_rules import ResourceType
 from backend.schemas.common import ApiResponse
 from backend.services.asset_service import AssetService
 
@@ -34,6 +35,33 @@ async def create_resource(
 ) -> ApiResponse[ResourceRead]:
     """登记资源。路径必须相对项目 assets 且文件存在。"""
     data = await service.create(ctx.id, payload)
+    return ApiResponse(data=data)
+
+
+@router.post("/resources/upload", status_code=status.HTTP_201_CREATED)
+async def upload_resource(
+    ctx: ProjectContext = Depends(get_project_context),
+    file: UploadFile = File(...),
+    code: str = Form(...),
+    name: str = Form(...),
+    resource_type: ResourceType = Form(...),
+    path: str | None = Form(default=None),
+    checksum: str | None = Form(default=None),
+    service: AssetService = Depends(get_asset_service),
+) -> ApiResponse[ResourceRead]:
+    """上传二进制资源并写入项目 assets。"""
+    content = await file.read()
+    data = await service.upload(
+        ctx.id,
+        code=code,
+        name=name,
+        resource_type=resource_type,
+        filename=file.filename or "unnamed.bin",
+        content=content,
+        path=path,
+        checksum=checksum,
+        mime_type=file.content_type,
+    )
     return ApiResponse(data=data)
 
 

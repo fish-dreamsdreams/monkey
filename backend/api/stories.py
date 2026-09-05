@@ -107,6 +107,19 @@ async def add_chapter(
     return ApiResponse(data=data)
 
 
+@router.put("/stories/{story_id}/chapters/{chapter_id}")
+async def update_chapter(
+    payload: StoryChapterWrite,
+    ctx: ProjectContext = Depends(get_project_context),
+    story_id: str = Depends(valid_story_id),
+    chapter_id: str = Depends(valid_story_chapter_id),
+    service: StoryService = Depends(get_story_service),
+) -> ApiResponse[StoryChapterRead]:
+    """更新章节。"""
+    data = await service.update_chapter(ctx.id, story_id, chapter_id, payload)
+    return ApiResponse(data=data)
+
+
 @router.delete("/stories/{story_id}/chapters/{chapter_id}")
 async def delete_chapter(
     ctx: ProjectContext = Depends(get_project_context),

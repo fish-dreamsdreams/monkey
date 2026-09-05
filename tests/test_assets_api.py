@@ -211,3 +211,23 @@ async def test_bind_skill_icon_and_city_icon(client: AsyncClient) -> None:
         json={"resource_id": portrait.json()["data"]["id"]},
     )
     assert wrong.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_upload_resource_file(client: AsyncClient) -> None:
+    project_id = await _create_project(client)
+    uploaded = await client.post(
+        f"/api/v1/projects/{project_id}/resources/upload",
+        data={
+            "code": "res_upload_portrait",
+            "name": "上传头像",
+            "resource_type": "portrait",
+            "path": "portraits/upload.png",
+        },
+        files={"file": ("liu.png", PORTRAIT_BYTES, "image/png")},
+    )
+    assert uploaded.status_code == 201
+    body = uploaded.json()["data"]
+    assert body["exists"] is True
+    assert body["path"] == "portraits/upload.png"
+    assert body["checksum_ok"] is True

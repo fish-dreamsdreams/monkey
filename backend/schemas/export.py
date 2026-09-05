@@ -68,6 +68,19 @@ class ExportResult(BaseModel):
     package: ExportPackage
 
 
+class SnapshotResult(BaseModel):
+    """编辑器保存的项目包。不要求通过导出校验。"""
+
+    snapshot_dir: str
+    package: ExportPackage
+
+
+class OpenSnapshotWrite(BaseModel):
+    """从磁盘项目包打开为新的工作库项目。"""
+
+    snapshot_dir: str = Field(min_length=1, max_length=500)
+
+
 class ClientSchemaRead(BaseModel):
     """冻结合同摘要。客户端只读此版本，不连编辑器数据库。"""
 

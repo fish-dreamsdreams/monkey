@@ -118,6 +118,40 @@ class AssetService:
             raise NotFoundError("资源创建后读取失败")
         return self._to_read(saved, root)
 
+    async def upload(
+        self,
+        project_id: str,
+        *,
+        code: str,
+        name: str,
+        resource_type: ResourceType,
+        filename: str,
+        content: bytes,
+        path: str | None = None,
+        checksum: str | None = None,
+        mime_type: str | None = None,
+    ) -> ResourceRead:
+        """接收上传的二进制并登记为资源。"""
+        safe_name = Path(filename).name
+        if not safe_name or safe_name in {".", ".."}:
+            raise ValidationError("文件名不合法", field="file")
+        if not content:
+            raise ValidationError("上传文件不能为空", field="file")
+        relative = path or f"uploads/{safe_name}"
+        encoded = base64.b64encode(content).decode("ascii")
+        return await self.create(
+            project_id,
+            ResourceWrite(
+                code=code,
+                name=name,
+                resource_type=resource_type,
+                path=relative,
+                checksum=checksum,
+                mime_type=mime_type,
+                content_base64=encoded,
+            ),
+        )
+
     async def get(self, project_id: str, resource_id: str) -> ResourceRead:
         """获取资源并复查文件是否仍在。"""
         resource = await self._require_resource(project_id, resource_id)

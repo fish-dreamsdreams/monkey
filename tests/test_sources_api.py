@@ -113,3 +113,37 @@ async def test_add_and_delete_character_citation(client: AsyncClient) -> None:
     assert deleted.status_code == 200
     detail = await client.get(f"/api/v1/projects/{project_id}/characters/{character_id}")
     assert detail.json()["data"]["sources"] == []
+
+
+@pytest.mark.asyncio
+async def test_update_and_delete_custom_source(client: AsyncClient) -> None:
+    project_id = await _create_project(client)
+    created = await client.post(
+        f"/api/v1/projects/{project_id}/sources",
+        json={"code": "sgz_note", "name": "三国志注", "source_type": "historical_book"},
+    )
+    assert created.status_code == 201
+    source_id = created.json()["data"]["id"]
+    updated = await client.put(
+        f"/api/v1/projects/{project_id}/sources/{source_id}",
+        json={"name": "三国志裴注", "source_type": "historical_book"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["data"]["name"] == "三国志裴注"
+
+    deleted = await client.delete(f"/api/v1/projects/{project_id}/sources/{source_id}")
+    assert deleted.status_code == 200
+
+    catalog = await client.get(f"/api/v1/projects/{project_id}/sources")
+    system_id = next(item["id"] for item in catalog.json()["data"] if item["code"] == "sanguozhi")
+    blocked = await client.delete(f"/api/v1/projects/{project_id}/sources/{system_id}")
+    assert blocked.status_code == 409
+
+    character = await client.post(f"/api/v1/projects/{project_id}/characters", json=LIU_BEI)
+    character_id = character.json()["data"]["id"]
+    await client.post(
+        f"/api/v1/projects/{project_id}/characters/{character_id}/sources",
+        json={"source_code": "sanguozhi", "bound_layer": "historical", "reference": "先主传"},
+    )
+    cited = await client.delete(f"/api/v1/projects/{project_id}/sources/{system_id}")
+    assert cited.status_code == 409

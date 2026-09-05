@@ -6,7 +6,7 @@ from backend.domain.source_types import SourceType, is_fact_eligible, validate_s
 from backend.models.source import Source
 from backend.repositories.project_repository import ProjectRepository
 from backend.repositories.source_repository import SourceRepository
-from backend.schemas.source import SourceCreate, SourceRead
+from backend.schemas.source import SourceCreate, SourceRead, SourceUpdate
 
 
 def to_source_read(source: Source) -> SourceRead:
@@ -55,6 +55,38 @@ class SourceService:
         if project is not None:
             await self._projects.bump_content_version(project)
         return to_source_read(source)
+
+    async def update(self, project_id: str, source_id: str, payload: SourceUpdate) -> SourceRead:
+        """更新自定义来源。系统预置来源不可改类型。"""
+        source = await self._require_source(project_id, source_id)
+        validate_source_definition(payload.name, payload.source_type)
+        if source.is_system and payload.source_type.value != source.source_type:
+            raise ConflictError("系统预置来源不能更改类型")
+        source.name = payload.name.strip()
+        source.source_type = payload.source_type.value
+        project = await self._projects.get(project_id)
+        if project is not None:
+            await self._projects.bump_content_version(project)
+        return to_source_read(source)
+
+    async def delete(self, project_id: str, source_id: str) -> None:
+        """删除自定义来源。已被引用或系统预置时拒绝。"""
+        source = await self._require_source(project_id, source_id)
+        if source.is_system:
+            raise ConflictError("系统预置来源不能删除")
+        if await self._sources.count_usages(source.id) > 0:
+            raise ConflictError("来源仍被人物或事件引用，不能删除")
+        await self._sources.delete(source)
+        project = await self._projects.get(project_id)
+        if project is not None:
+            await self._projects.bump_content_version(project)
+
+    async def _require_source(self, project_id: str, source_id: str) -> Source:
+        await self._require_project(project_id)
+        source = await self._sources.get(project_id, source_id)
+        if source is None:
+            raise NotFoundError("来源不存在")
+        return source
 
     async def _require_project(self, project_id: str) -> None:
         project = await self._projects.get(project_id)

@@ -98,3 +98,29 @@ async def test_import_rejects_tampered_checksum(client: AsyncClient) -> None:
     rejected = await client.post("/api/v1/projects/import", json=package)
     assert rejected.status_code == 400
     assert rejected.json()["error"]["details"][0]["field"] == "files"
+
+
+@pytest.mark.asyncio
+async def test_save_snapshot_without_validation_and_open(client: AsyncClient) -> None:
+    project_id = await _create_project(client)
+    await client.post(f"/api/v1/projects/{project_id}/characters", json=LIU_BEI)
+    story = await client.post(
+        f"/api/v1/projects/{project_id}/stories",
+        json={"code": "sty_broken", "name": "残缺剧情", "layer": "literary"},
+    )
+    assert story.status_code == 201
+    blocked = await client.post(f"/api/v1/projects/{project_id}/export")
+    assert blocked.status_code == 409
+
+    saved = await client.post(f"/api/v1/projects/{project_id}/save")
+    assert saved.status_code == 200
+    snapshot_dir = saved.json()["data"]["snapshot_dir"]
+    assert Path(snapshot_dir).joinpath("manifest.json").is_file()
+
+    opened = await client.post("/api/v1/projects/open", json={"snapshot_dir": snapshot_dir})
+    assert opened.status_code == 201
+    new_id = opened.json()["data"]["id"]
+    assert new_id != project_id
+    listing = await client.get(f"/api/v1/projects/{new_id}/characters")
+    names = {item["name"] for item in listing.json()["data"]}
+    assert "刘备" in names

@@ -1,9 +1,10 @@
 """史料目录与引文仓储。"""
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from backend.models.event import EventSource
 from backend.models.source import CharacterSource, Source
 
 
@@ -53,6 +54,21 @@ class SourceRepository:
             select(Source).where(Source.project_id == project_id, Source.code.in_(codes))
         )
         return list(result.scalars().all())
+
+    async def count_usages(self, source_id: str) -> int:
+        """统计人物引文与事件引文数量。"""
+        character_count = await self._session.scalar(
+            select(func.count()).select_from(CharacterSource).where(CharacterSource.source_id == source_id)
+        )
+        event_count = await self._session.scalar(
+            select(func.count()).select_from(EventSource).where(EventSource.source_id == source_id)
+        )
+        return int(character_count or 0) + int(event_count or 0)
+
+    async def delete(self, source: Source) -> None:
+        """删除来源目录条目。"""
+        await self._session.delete(source)
+        await self._session.flush()
 
     async def add_citation(self, citation: CharacterSource) -> CharacterSource:
         """插入人物引文。"""

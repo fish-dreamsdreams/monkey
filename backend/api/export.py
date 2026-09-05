@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query, status
 from backend.api.context import ProjectContext, get_project_context
 from backend.api.deps import get_export_service
 from backend.schemas.common import ApiResponse
-from backend.schemas.export import ExportPackage, ExportResult
+from backend.schemas.export import ExportPackage, ExportResult, OpenSnapshotWrite, SnapshotResult
 from backend.schemas.project import ProjectRead
 from backend.services.export_service import ExportService
 from backend.validation.types import ValidationMode
@@ -21,6 +21,32 @@ async def import_project(
     """按 schema 与 checksum 导入为新项目。"""
     data = await service.import_package(payload)
     return ApiResponse(data=data, meta={"schema_version": data.schema_version})
+
+
+@router.post("/projects/open", status_code=status.HTTP_201_CREATED)
+async def open_snapshot(
+    payload: OpenSnapshotWrite,
+    service: ExportService = Depends(get_export_service),
+) -> ApiResponse[ProjectRead]:
+    """从保存的项目包目录打开为新项目。"""
+    data = await service.open_snapshot(payload.snapshot_dir)
+    return ApiResponse(data=data, meta={"schema_version": data.schema_version})
+
+
+@router.post("/projects/{project_id}/save")
+async def save_snapshot(
+    ctx: ProjectContext = Depends(get_project_context),
+    service: ExportService = Depends(get_export_service),
+) -> ApiResponse[SnapshotResult]:
+    """保存工作库为项目包。不要求通过导出校验。"""
+    data = await service.save_snapshot(ctx.id)
+    return ApiResponse(
+        data=data,
+        meta={
+            "schema_version": data.package.manifest.schema_version,
+            "content_version": data.package.manifest.content_version,
+        },
+    )
 
 
 @router.post("/projects/{project_id}/export")

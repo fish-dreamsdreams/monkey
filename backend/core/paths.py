@@ -18,3 +18,13 @@ def project_assets_dir(project_id: str) -> Path:
 def project_export_dir(project_id: str, content_version: int) -> Path:
     """面向客户端的冻结导出目录。"""
     return PROJECT_ASSETS_ROOT / project_id / "exports" / f"v{content_version}"
+
+
+def project_root_dir(project_id: str) -> Path:
+    """单个内容项目在工作区中的根目录。"""
+    return PROJECT_ASSETS_ROOT / project_id
+
+
+def project_snapshot_dir(project_id: str) -> Path:
+    """编辑器保存的项目包目录。不要求先通过导出校验。"""
+    return PROJECT_ASSETS_ROOT / project_id / "snapshot"

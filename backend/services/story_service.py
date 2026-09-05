@@ -152,6 +152,29 @@ class StoryService:
         await self._stories.delete_chapter(chapter)
         await self._bump(project_id)
 
+    async def update_chapter(
+        self,
+        project_id: str,
+        story_id: str,
+        chapter_id: str,
+        payload: StoryChapterWrite,
+    ) -> StoryChapterRead:
+        """更新章节。"""
+        story = await self._require_story(project_id, story_id)
+        chapter = await self._stories.get_chapter(story_id, chapter_id)
+        if chapter is None:
+            raise NotFoundError("章节不存在")
+        if payload.code != chapter.code:
+            exists = await self._stories.get_chapter_by_code(story.id, payload.code)
+            if exists is not None:
+                raise ConflictError(f"章节 code 已存在: {payload.code}")
+        chapter.code = payload.code
+        chapter.name = payload.name
+        chapter.sort_order = payload.sort_order
+        chapter.summary = payload.summary
+        await self._bump(project_id)
+        return self._to_chapter_read(chapter)
+
     async def add_node(self, project_id: str, story_id: str, payload: StoryNodeWrite) -> StoryNodeRead:
         """新增节点。"""
         story = await self._require_story(project_id, story_id)

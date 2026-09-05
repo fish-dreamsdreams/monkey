@@ -213,3 +213,26 @@ async def test_historical_event_node_requires_existing_event(client: AsyncClient
     )
     assert node.status_code == 201
     assert node.json()["data"]["event"]["name"] == "赤壁之战"
+
+
+@pytest.mark.asyncio
+async def test_update_story_chapter(client: AsyncClient) -> None:
+    project_id = await _create_project(client)
+    story = await client.post(
+        f"/api/v1/projects/{project_id}/stories",
+        json={"code": "peach_garden", "name": "桃园结义", "layer": "literary"},
+    )
+    story_id = story.json()["data"]["id"]
+    chapter = await client.post(
+        f"/api/v1/projects/{project_id}/stories/{story_id}/chapters",
+        json={"code": "ch1", "name": "结义", "sort_order": 1},
+    )
+    chapter_id = chapter.json()["data"]["id"]
+    updated = await client.put(
+        f"/api/v1/projects/{project_id}/stories/{story_id}/chapters/{chapter_id}",
+        json={"code": "ch1", "name": "桃园", "sort_order": 2, "summary": "结义开篇"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["data"]["name"] == "桃园"
+    assert updated.json()["data"]["sort_order"] == 2
+    assert updated.json()["data"]["summary"] == "结义开篇"

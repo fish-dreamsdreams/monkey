@@ -2,11 +2,11 @@
 
 from fastapi import APIRouter, Depends, status
 
-from backend.api.context import ProjectContext, get_project_context
+from backend.api.context import ProjectContext, get_project_context, valid_personality_tag_id
 from backend.api.deps import get_project_service
 from backend.schemas.character import PersonalityTagRead
 from backend.schemas.common import ApiResponse
-from backend.schemas.personality import PersonalityTagCreate
+from backend.schemas.personality import PersonalityTagCreate, PersonalityTagUpdate
 from backend.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
 from backend.services.project_service import ProjectService
 
@@ -53,6 +53,16 @@ async def update_project(
     return ApiResponse(data=data)
 
 
+@router.delete("/{project_id}")
+async def delete_project(
+    ctx: ProjectContext = Depends(get_project_context),
+    service: ProjectService = Depends(get_project_service),
+) -> ApiResponse[None]:
+    """删除项目及工作区文件。"""
+    await service.delete(ctx.id)
+    return ApiResponse(data=None, meta={"deleted": True})
+
+
 @router.get("/{project_id}/personality-tags")
 async def list_personality_tags(
     ctx: ProjectContext = Depends(get_project_context),
@@ -73,3 +83,26 @@ async def create_personality_tag(
     """新增自定义性格标签。"""
     tag = await service.create_personality_tag(ctx.id, payload)
     return ApiResponse(data=PersonalityTagRead.model_validate(tag))
+
+
+@router.put("/{project_id}/personality-tags/{tag_id}")
+async def update_personality_tag(
+    payload: PersonalityTagUpdate,
+    ctx: ProjectContext = Depends(get_project_context),
+    tag_id: str = Depends(valid_personality_tag_id),
+    service: ProjectService = Depends(get_project_service),
+) -> ApiResponse[PersonalityTagRead]:
+    """更新性格标签名称与说明。"""
+    tag = await service.update_personality_tag(ctx.id, tag_id, payload)
+    return ApiResponse(data=PersonalityTagRead.model_validate(tag))
+
+
+@router.delete("/{project_id}/personality-tags/{tag_id}")
+async def delete_personality_tag(
+    ctx: ProjectContext = Depends(get_project_context),
+    tag_id: str = Depends(valid_personality_tag_id),
+    service: ProjectService = Depends(get_project_service),
+) -> ApiResponse[None]:
+    """删除自定义性格标签。"""
+    await service.delete_personality_tag(ctx.id, tag_id)
+    return ApiResponse(data=None, meta={"deleted": True})

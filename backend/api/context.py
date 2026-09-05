@@ -39,6 +39,16 @@ def valid_citation_id(citation_id: str) -> str:
     return require_id(citation_id, EntityPrefix.CITATION, field="citation_id")
 
 
+def valid_personality_tag_id(tag_id: str) -> str:
+    """校验路径参数 tag_id。"""
+    return require_id(tag_id, EntityPrefix.PERSONALITY_TAG, field="tag_id")
+
+
+def valid_source_id(source_id: str) -> str:
+    """校验路径参数 source_id。"""
+    return require_id(source_id, EntityPrefix.SOURCE, field="source_id")
+
+
 def valid_relationship_id(relationship_id: str) -> str:
     """校验路径参数 relationship_id。"""
     return require_id(relationship_id, EntityPrefix.RELATIONSHIP, field="relationship_id")

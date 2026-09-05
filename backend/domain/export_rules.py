@@ -1,32 +1,35 @@
 """项目导入导出规则。
 
 职责：规范客户端数据包分区、canonical checksum，以及 schema 兼容性。
-不包含任务/时间线模块（尚未实现）。
+分区文件列表以 packages/game-data-schema/frozen.json 为准。
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+from functools import lru_cache
+from typing import Any
 
 from backend.core.exceptions import UnsupportedSchemaError, ValidationError
+from backend.core.paths import REPO_ROOT
 from backend.core.schema_version import CURRENT_SCHEMA_VERSION, SUPPORTED_SCHEMA_VERSIONS
 
-PACKAGE_SECTION_FILES: tuple[str, ...] = (
-    "project.json",
-    "personality_tags.json",
-    "sources.json",
-    "characters.json",
-    "relationships.json",
-    "skills.json",
-    "character_skills.json",
-    "maps.json",
-    "cities.json",
-    "factions.json",
-    "events.json",
-    "stories.json",
-    "resources.json",
-)
+FROZEN_CONTRACT_PATH = REPO_ROOT / "packages" / "game-data-schema" / "frozen.json"
+
+
+@lru_cache(maxsize=1)
+def load_frozen_contract() -> dict[str, Any]:
+    """读取冻结合同。"""
+    return json.loads(FROZEN_CONTRACT_PATH.read_text(encoding="utf-8"))
+
+
+def frozen_client_schema_version() -> str:
+    """游戏客户端冻结的数据包版本。"""
+    return str(load_frozen_contract()["schema_version"])
+
+
+PACKAGE_SECTION_FILES: tuple[str, ...] = tuple(load_frozen_contract()["files"])
 
 
 def canonical_json(payload: object) -> str:

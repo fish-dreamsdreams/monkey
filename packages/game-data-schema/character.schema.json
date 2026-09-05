@@ -2,17 +2,17 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sanguo-editor.local/schema/character.schema.json",
   "title": "CharacterExport",
-  "description": "人物导出契约。schema_version=1.2.0。客户端只读此结构，不连接编辑器数据库。演义引文不得写入 historical。",
+  "description": "人物导出契约。属于冻结包 schema_version=1.12.0。code 在 base 内。演义引文不得写入 historical。",
   "type": "object",
-  "required": ["schema_version", "id", "code", "base", "historical", "game"],
+  "required": ["id", "base", "historical", "game"],
   "properties": {
-    "schema_version": { "type": "string", "const": "1.2.0" },
     "id": { "type": "string" },
-    "code": { "type": "string" },
+    "project_id": { "type": "string" },
     "base": {
       "type": "object",
-      "required": ["name", "gender"],
+      "required": ["code", "name", "gender"],
       "properties": {
+        "code": { "type": "string" },
         "name": { "type": "string" },
         "courtesy_name": { "type": ["string", "null"] },
         "gender": { "enum": ["male", "female", "unknown"] },
@@ -36,7 +36,7 @@
     },
     "game": {
       "type": "object",
-      "description": "游戏设定，可因平衡性调整",
+      "description": "游戏设定，可因平衡性调整。客户端只读，不在编辑器内结算。",
       "properties": {
         "force": { "type": "integer", "minimum": 0, "maximum": 100 },
         "intelligence": { "type": "integer", "minimum": 0, "maximum": 100 },
@@ -52,27 +52,23 @@
         }
       }
     },
+    "presentation": {
+      "type": "object",
+      "properties": {
+        "portrait": { "type": ["object", "null"] },
+        "model": { "type": ["object", "null"] }
+      }
+    },
     "sources": {
       "type": "array",
       "description": "人物引文。bound_layer=historical 的条目必须来自正史/史书/论文/学术资料。",
       "items": {
         "type": "object",
-        "required": ["source_code", "source_type", "bound_layer"],
+        "required": ["source_code", "bound_layer"],
         "properties": {
           "source_code": { "type": "string" },
           "source_name": { "type": "string" },
-          "source_type": {
-            "enum": [
-              "official_history",
-              "historical_book",
-              "paper",
-              "academic",
-              "tradition",
-              "folklore",
-              "literary",
-              "game_setting"
-            ]
-          },
+          "source_type": { "type": "string" },
           "bound_layer": { "enum": ["historical", "literary", "game"] },
           "quotation": { "type": ["string", "null"] },
           "reference": { "type": ["string", "null"] },

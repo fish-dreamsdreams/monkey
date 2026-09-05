@@ -37,6 +37,7 @@ async def test_health_and_meta(client: AsyncClient) -> None:
     assert any(item["code"] == "strict_historical" for item in body["validation_modes"])
     assert "characters.json" in body["package_files"]
     assert "quests.json" not in body["package_files"]
+    assert body["frozen_client_schema_version"] == CURRENT_SCHEMA_VERSION
     assert any(item["code"] == "leader" for item in body["member_roles"])
     assert any(item["code"] == "water" for item in body["terrain_types"])
     assert any(item["code"] == "river" for item in body["map_feature_types"])

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.12.0",
+  "note": "客户端只读导出包，禁止把运行时存档写回编辑器工作库。不含 quests/timeline。",
+  "files": [
+    "project.json",
+    "personality_tags.json",
+    "sources.json",
+    "characters.json",
+    "relationships.json",
+    "skills.json",
+    "character_skills.json",
+    "maps.json",
+    "cities.json",
+    "factions.json",
+    "events.json",
+    "stories.json",
+    "resources.json"
+  ],
+  "unsupported_files": ["quests.json", "timeline.json"],
+  "documents": [
+    "package.schema.json",
+    "character.schema.json",
+    "city.schema.json",
+    "faction.schema.json",
+    "map.schema.json",
+    "skill.schema.json",
+    "relationship.schema.json",
+    "event.schema.json",
+    "story.schema.json",
+    "resource.schema.json"
+  ]
+}

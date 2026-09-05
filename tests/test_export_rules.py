@@ -21,7 +21,7 @@ def test_checksum_is_stable() -> None:
 
 
 def test_parse_and_accept_current_schema() -> None:
-    assert parse_schema_version("1.11.0") == (1, 11, 0)
+    assert parse_schema_version("1.12.0") == (1, 12, 0)
     assert_importable_schema(CURRENT_SCHEMA_VERSION)
     assert_importable_schema("1.10.0")
 

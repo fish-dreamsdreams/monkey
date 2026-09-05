@@ -1,0 +1,9 @@
+{
+  "code": "proj_sample",
+  "name": "示例内容包",
+  "description": "供客户端加载器验收，不是运行时存档。",
+  "target_start_year": 184,
+  "target_end_year": 280,
+  "schema_version": "1.12.0",
+  "content_version": 1
+}

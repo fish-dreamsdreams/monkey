@@ -2,11 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sanguo-editor.local/schema/resource.schema.json",
   "title": "ResourceExport",
-  "description": "资源导出契约。schema_version=1.9.0。人物通过 portrait_asset_id / model_asset_id 引用，不存裸路径。",
+  "description": "资源导出契约。属于冻结包 schema_version=1.12.0。人物通过 presentation 引用资源 ID，不存裸路径。",
   "type": "object",
-  "required": ["schema_version", "id", "code", "name", "resource_type", "path", "checksum"],
+  "required": ["id", "code", "name", "resource_type", "path", "checksum"],
   "properties": {
-    "schema_version": { "type": "string", "const": "1.9.0" },
     "id": { "type": "string" },
     "code": { "type": "string" },
     "name": { "type": "string" },

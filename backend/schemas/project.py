@@ -77,3 +77,4 @@ class EditorMetaRead(BaseModel):
     mesh_formats: list[TypeMeta]
     validation_modes: list[TypeMeta]
     package_files: list[str]
+    frozen_client_schema_version: str

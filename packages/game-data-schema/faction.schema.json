@@ -2,46 +2,26 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sanguo-editor.local/schema/faction.schema.json",
   "title": "FactionExport",
-  "description": "势力导出契约。schema_version=1.5.0。势力由用户创建，不预置魏蜀吴。成员与领土均为时序记录。",
+  "description": "势力导出契约。属于冻结包 schema_version=1.12.0。分区项为 {faction, members, territories}。不预置魏蜀吴。",
   "type": "object",
-  "required": ["schema_version", "id", "code", "name"],
+  "required": ["faction"],
   "properties": {
-    "schema_version": { "type": "string", "const": "1.5.0" },
-    "id": { "type": "string" },
-    "code": { "type": "string" },
-    "name": { "type": "string" },
-    "color": { "type": "string" },
-    "leader_character_id": { "type": ["string", "null"] },
-    "capital_city_id": { "type": ["string", "null"] },
-    "start_year": { "type": ["integer", "null"] },
-    "end_year": { "type": ["integer", "null"] },
-    "historical_description": { "type": ["string", "null"] },
-    "members": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["character_id", "role"],
-        "properties": {
-          "character_id": { "type": "string" },
-          "role": { "enum": ["leader", "heir", "officer", "member"] },
-          "start_year": { "type": ["integer", "null"] },
-          "end_year": { "type": ["integer", "null"] },
-          "note": { "type": ["string", "null"] }
-        }
+    "faction": {
+      "type": "object",
+      "required": ["id", "code", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "color": { "type": "string" },
+        "leader": { "type": ["object", "null"] },
+        "capital": { "type": ["object", "null"] },
+        "start_year": { "type": ["integer", "null"] },
+        "end_year": { "type": ["integer", "null"] },
+        "historical_description": { "type": ["string", "null"] }
       }
     },
-    "territories": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["city_id"],
-        "properties": {
-          "city_id": { "type": "string" },
-          "start_year": { "type": ["integer", "null"] },
-          "end_year": { "type": ["integer", "null"] },
-          "note": { "type": ["string", "null"] }
-        }
-      }
-    }
+    "members": { "type": "array" },
+    "territories": { "type": "array" }
   }
 }

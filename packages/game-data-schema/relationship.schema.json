@@ -2,14 +2,29 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sanguo-editor.local/schema/relationship.schema.json",
   "title": "CharacterRelationshipExport",
-  "description": "人物关系导出契约。schema_version=1.3.0。对称关系导出一条主边即可，客户端可自行补反向。",
+  "description": "人物关系导出契约。属于冻结包 schema_version=1.12.0。对称关系导出一条主边即可。",
   "type": "object",
-  "required": ["schema_version", "id", "from_character_code", "to_character_code", "relationship_type"],
+  "required": ["id", "from_character", "to_character", "relationship_type"],
   "properties": {
-    "schema_version": { "type": "string", "const": "1.3.0" },
     "id": { "type": "string" },
-    "from_character_code": { "type": "string" },
-    "to_character_code": { "type": "string" },
+    "from_character": {
+      "type": "object",
+      "required": ["id", "code", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "to_character": {
+      "type": "object",
+      "required": ["id", "code", "name"],
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
     "relationship_type": {
       "enum": [
         "kinship",

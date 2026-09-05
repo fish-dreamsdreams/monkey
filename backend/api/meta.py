@@ -4,8 +4,14 @@ from fastapi import APIRouter
 
 from backend.core.alembic_runtime import script_head_revision
 from backend.core.ids import EntityPrefix
-from backend.core.schema_version import API_VERSION, CURRENT_SCHEMA_VERSION, SUPPORTED_SCHEMA_VERSIONS
-from backend.domain.export_rules import PACKAGE_SECTION_FILES
+from backend.core.schema_version import (
+    API_VERSION,
+    CURRENT_SCHEMA_VERSION,
+    FROZEN_CLIENT_SCHEMA_VERSION,
+    SUPPORTED_SCHEMA_VERSIONS,
+)
+from backend.domain.export_rules import PACKAGE_SECTION_FILES, load_frozen_contract
+from backend.schemas.export import ClientSchemaRead
 from backend.domain.relationship_types import (
     RELATIONSHIP_TYPE_LABELS_ZH,
     RelationshipType,
@@ -119,5 +125,21 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
             TypeMeta(code=item.value, name_zh=VALIDATION_MODE_LABELS_ZH[item]) for item in ValidationMode
         ],
         package_files=list(PACKAGE_SECTION_FILES),
+        frozen_client_schema_version=FROZEN_CLIENT_SCHEMA_VERSION,
+    )
+    return ApiResponse(data=data)
+
+
+@router.get("/client-schema")
+async def get_client_schema() -> ApiResponse[ClientSchemaRead]:
+    """返回游戏客户端冻结合同。加载器用 game_data_loader，不写回工作库。"""
+    contract = load_frozen_contract()
+    data = ClientSchemaRead(
+        schema_version=str(contract["schema_version"]),
+        files=list(contract["files"]),
+        unsupported_files=list(contract["unsupported_files"]),
+        schema_documents=list(contract["documents"]),
+        loader="game_data_loader",
+        note=str(contract["note"]),
     )
     return ApiResponse(data=data)

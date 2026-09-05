@@ -28,7 +28,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["backend*"]
+include = ["backend*", "game_data_loader*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

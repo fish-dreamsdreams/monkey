@@ -37,7 +37,7 @@ class Project(Base):
     code: Mapped[str] = mapped_column(String(64), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.11.0")
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.12.0")
     content_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     target_start_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     target_end_year: Mapped[int | None] = mapped_column(Integer, nullable=True)

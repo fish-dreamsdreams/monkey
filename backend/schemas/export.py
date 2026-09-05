@@ -66,3 +66,14 @@ class ExportResult(BaseModel):
 
     export_dir: str
     package: ExportPackage
+
+
+class ClientSchemaRead(BaseModel):
+    """冻结合同摘要。客户端只读此版本，不连编辑器数据库。"""
+
+    schema_version: str
+    files: list[str]
+    unsupported_files: list[str]
+    schema_documents: list[str]
+    loader: str
+    note: str

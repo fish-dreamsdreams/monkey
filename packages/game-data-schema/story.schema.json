@@ -2,11 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sanguo-editor.local/schema/story.schema.json",
   "title": "StoryExport",
-  "description": "剧情导出契约。schema_version=1.8.0。节点图属于游戏叙事层。无条件边禁止成环；条件回边必须带终止条件。",
+  "description": "剧情导出契约。属于冻结包 schema_version=1.12.0。节点图属于游戏叙事层。无条件边禁止成环；条件回边必须带终止条件。",
   "type": "object",
-  "required": ["schema_version", "id", "code", "name", "nodes"],
+  "required": ["id", "code", "name", "nodes"],
   "properties": {
-    "schema_version": { "type": "string", "const": "1.8.0" },
     "id": { "type": "string" },
     "code": { "type": "string" },
     "name": { "type": "string" },

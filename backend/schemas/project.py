@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.schemas.relationship import RelationshipTypeMeta
 from backend.schemas.source import SourceTypeMeta
 
 
@@ -57,3 +58,4 @@ class EditorMetaRead(BaseModel):
     alembic_script_head: str
     id_prefixes: dict[str, str]
     source_types: list[SourceTypeMeta]
+    relationship_types: list[RelationshipTypeMeta]

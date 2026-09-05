@@ -39,6 +39,11 @@ def valid_citation_id(citation_id: str) -> str:
     return require_id(citation_id, EntityPrefix.CITATION, field="citation_id")
 
 
+def valid_relationship_id(relationship_id: str) -> str:
+    """校验路径参数 relationship_id。"""
+    return require_id(relationship_id, EntityPrefix.RELATIONSHIP, field="relationship_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

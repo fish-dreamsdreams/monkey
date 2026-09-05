@@ -5,9 +5,15 @@ from fastapi import APIRouter
 from backend.core.alembic_runtime import script_head_revision
 from backend.core.ids import EntityPrefix
 from backend.core.schema_version import API_VERSION, CURRENT_SCHEMA_VERSION, SUPPORTED_SCHEMA_VERSIONS
+from backend.domain.relationship_types import (
+    RELATIONSHIP_TYPE_LABELS_ZH,
+    RelationshipType,
+    is_symmetric,
+)
 from backend.domain.source_types import SOURCE_TYPE_LABELS_ZH, SourceType, is_fact_eligible
 from backend.schemas.common import ApiResponse
 from backend.schemas.project import EditorMetaRead
+from backend.schemas.relationship import RelationshipTypeMeta
 from backend.schemas.source import SourceTypeMeta
 
 router = APIRouter(tags=["meta"])
@@ -29,6 +35,14 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
                 fact_eligible=is_fact_eligible(item),
             )
             for item in SourceType
+        ],
+        relationship_types=[
+            RelationshipTypeMeta(
+                code=item.value,
+                name_zh=RELATIONSHIP_TYPE_LABELS_ZH[item],
+                symmetric=is_symmetric(item),
+            )
+            for item in RelationshipType
         ],
     )
     return ApiResponse(data=data)

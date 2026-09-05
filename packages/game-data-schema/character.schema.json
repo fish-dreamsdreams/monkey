@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanguo-editor.local/schema/character.schema.json",
+  "title": "CharacterExport",
+  "description": "Phase 1 人物导出契约。schema_version=1.0.0。客户端只读此结构，不连接编辑器数据库。",
+  "type": "object",
+  "required": ["schema_version", "id", "code", "base", "historical", "game"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "id": { "type": "string" },
+    "code": { "type": "string" },
+    "base": {
+      "type": "object",
+      "required": ["name", "gender"],
+      "properties": {
+        "name": { "type": "string" },
+        "courtesy_name": { "type": ["string", "null"] },
+        "gender": { "enum": ["male", "female", "unknown"] },
+        "birth_year": { "type": ["integer", "null"] },
+        "death_year": { "type": ["integer", "null"] },
+        "birthplace": { "type": ["string", "null"] },
+        "ethnicity": { "type": ["string", "null"] },
+        "identity": { "type": ["string", "null"] }
+      }
+    },
+    "historical": {
+      "type": "object",
+      "description": "历史事实，禁止写入游戏数值",
+      "properties": {
+        "biography": { "type": ["string", "null"] },
+        "family_background": { "type": ["string", "null"] },
+        "life_experience": { "type": ["string", "null"] },
+        "achievements": { "type": ["string", "null"] },
+        "historical_evaluation": { "type": ["string", "null"] }
+      }
+    },
+    "game": {
+      "type": "object",
+      "description": "游戏设定，可因平衡性调整",
+      "properties": {
+        "force": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "intelligence": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "politics": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "charisma": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "leadership": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "stamina": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "morale": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "mobility": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "personality_tag_codes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

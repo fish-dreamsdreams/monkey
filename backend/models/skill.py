@@ -14,6 +14,7 @@ from sqlalchemy.types import JSON
 from backend.models.base import Base
 
 if TYPE_CHECKING:
+    from backend.models.asset import Resource
     from backend.models.character import Character
     from backend.models.project import Project
 
@@ -38,9 +39,14 @@ class Skill(Base):
     basis_source_type: Mapped[str | None] = mapped_column(String(32), nullable=True)
     basis_source_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     basis_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    icon_asset_id: Mapped[str | None] = mapped_column(
+        ForeignKey("resources.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
     project: Mapped[Project] = relationship(back_populates="skills")
     bindings: Mapped[list[CharacterSkill]] = relationship(back_populates="skill", cascade="all, delete-orphan")
+    icon_asset: Mapped[Resource | None] = relationship(foreign_keys=[icon_asset_id])
 
 
 class CharacterSkill(Base):

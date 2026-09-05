@@ -13,6 +13,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.models.base import Base
 
 if TYPE_CHECKING:
+    from backend.models.asset import Resource
     from backend.models.city import City
     from backend.models.project import Project
 
@@ -32,8 +33,13 @@ class GameMap(Base):
     cell_size: Mapped[int] = mapped_column(Integer, nullable=False, default=32)
     default_terrain: Mapped[str] = mapped_column(String(16), nullable=False, default="plain")
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    preview_asset_id: Mapped[str | None] = mapped_column(
+        ForeignKey("resources.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
     project: Mapped[Project] = relationship(back_populates="maps")
+    preview_asset: Mapped[Resource | None] = relationship(foreign_keys=[preview_asset_id])
     cells: Mapped[list[TerrainCell]] = relationship(back_populates="game_map", cascade="all, delete-orphan")
     features: Mapped[list[MapFeature]] = relationship(back_populates="game_map", cascade="all, delete-orphan")
     cities: Mapped[list[City]] = relationship(back_populates="game_map", passive_deletes=True)

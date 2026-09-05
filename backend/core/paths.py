@@ -7,3 +7,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ALEMBIC_INI = REPO_ROOT / "alembic.ini"
+PROJECT_ASSETS_ROOT = REPO_ROOT / "var" / "projects"
+
+
+def project_assets_dir(project_id: str) -> Path:
+    """用户项目资源根目录。不是编辑器自身 assets。"""
+    return PROJECT_ASSETS_ROOT / project_id / "assets"

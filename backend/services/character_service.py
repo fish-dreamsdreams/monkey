@@ -27,6 +27,7 @@ from backend.schemas.character import (
     Gender,
 )
 from backend.schemas.source import CharacterSourceRead, CharacterSourceWrite
+from backend.services.asset_service import presentation_from_character
 
 
 class CharacterService:
@@ -362,6 +363,7 @@ class CharacterService:
             ),
             personalities=personalities,
             sources=citations,
+            presentation=presentation_from_character(character),
             created_at=character.created_at,
             updated_at=character.updated_at,
         )

@@ -24,6 +24,8 @@ class CharacterRepository:
             selectinload(Character.attributes),
             selectinload(Character.personalities).selectinload(CharacterPersonality.tag),
             selectinload(Character.citations).selectinload(CharacterSource.source),
+            selectinload(Character.portrait_asset),
+            selectinload(Character.model_asset),
         )
 
     async def add(self, character: Character) -> Character:

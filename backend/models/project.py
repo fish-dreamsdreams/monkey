@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from backend.models.map import GameMap
     from backend.models.skill import Skill
     from backend.models.source import Source
+    from backend.models.asset import Resource
     from backend.models.story import Story
 
 
@@ -36,7 +37,7 @@ class Project(Base):
     code: Mapped[str] = mapped_column(String(64), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.8.0")
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.9.0")
     content_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     target_start_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     target_end_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -58,3 +59,4 @@ class Project(Base):
     maps: Mapped[list[GameMap]] = relationship(back_populates="project")
     events: Mapped[list[HistoricalEvent]] = relationship(back_populates="project")
     stories: Mapped[list[Story]] = relationship(back_populates="project")
+    resources: Mapped[list[Resource]] = relationship(back_populates="project")

@@ -144,6 +144,11 @@ def valid_story_cast_id(cast_id: str) -> str:
     return require_id(cast_id, EntityPrefix.STORY_NODE_CHARACTER, field="cast_id")
 
 
+def valid_resource_id(resource_id: str) -> str:
+    """校验路径参数 resource_id。"""
+    return require_id(resource_id, EntityPrefix.RESOURCE, field="resource_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

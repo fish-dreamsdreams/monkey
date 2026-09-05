@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from backend.api.assets import router as assets_router
 from backend.api.characters import router as characters_router
 from backend.api.cities import router as cities_router
 from backend.api.events import router as events_router
@@ -25,4 +26,5 @@ api_router.include_router(factions_router)
 api_router.include_router(maps_router)
 api_router.include_router(events_router)
 api_router.include_router(stories_router)
+api_router.include_router(assets_router)
 api_router.include_router(characters_router)

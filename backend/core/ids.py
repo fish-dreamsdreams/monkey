@@ -46,6 +46,8 @@ class EntityPrefix(str, Enum):
     STORY_CONDITION = "cnd"
     STORY_ACTION = "act"
     STORY_NODE_CHARACTER = "snc"
+    RESOURCE = "res"
+    MODEL_ASSET = "mas"
 
 
 def new_id(prefix: EntityPrefix) -> str:

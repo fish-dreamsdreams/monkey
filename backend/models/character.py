@@ -14,6 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.models.base import Base
 
 if TYPE_CHECKING:
+    from backend.models.asset import Resource
     from backend.models.personality import CharacterPersonality
     from backend.models.project import Project
     from backend.models.source import CharacterSource
@@ -36,6 +37,14 @@ class Character(Base):
     birthplace: Mapped[str | None] = mapped_column(String(100), nullable=True)
     ethnicity: Mapped[str | None] = mapped_column(String(50), nullable=True)
     identity: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    portrait_asset_id: Mapped[str | None] = mapped_column(
+        ForeignKey("resources.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    model_asset_id: Mapped[str | None] = mapped_column(
+        ForeignKey("resources.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -61,6 +70,12 @@ class Character(Base):
     citations: Mapped[list[CharacterSource]] = relationship(
         back_populates="character",
         cascade="all, delete-orphan",
+    )
+    portrait_asset: Mapped[Resource | None] = relationship(
+        foreign_keys=[portrait_asset_id],
+    )
+    model_asset: Mapped[Resource | None] = relationship(
+        foreign_keys=[model_asset_id],
     )
 
 

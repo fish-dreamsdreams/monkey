@@ -4,6 +4,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.db import get_db
+from backend.repositories.asset_repository import AssetRepository
 from backend.repositories.character_repository import CharacterRepository
 from backend.repositories.city_repository import CityRepository
 from backend.repositories.event_repository import EventRepository
@@ -14,6 +15,7 @@ from backend.repositories.relationship_repository import RelationshipRepository
 from backend.repositories.skill_repository import SkillRepository
 from backend.repositories.source_repository import SourceRepository
 from backend.repositories.story_repository import StoryRepository
+from backend.services.asset_service import AssetService
 from backend.services.character_service import CharacterService
 from backend.services.city_service import CityService
 from backend.services.event_service import EventService
@@ -104,6 +106,18 @@ def get_event_service(session: AsyncSession = Depends(get_db)) -> EventService:
         CityRepository(session),
         FactionRepository(session),
         SourceRepository(session),
+        ProjectRepository(session),
+    )
+
+
+def get_asset_service(session: AsyncSession = Depends(get_db)) -> AssetService:
+    """构造资源服务。"""
+    return AssetService(
+        AssetRepository(session),
+        CharacterRepository(session),
+        SkillRepository(session),
+        CityRepository(session),
+        MapRepository(session),
         ProjectRepository(session),
     )
 

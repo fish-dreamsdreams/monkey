@@ -5,6 +5,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.schemas.asset import CharacterPresentationRead
 from backend.schemas.source import CharacterSourceRead, CharacterSourceWrite
 
 
@@ -119,5 +120,6 @@ class CharacterRead(BaseModel):
     game: CharacterGameData
     personalities: list[CharacterPersonalityRead]
     sources: list[CharacterSourceRead]
+    presentation: CharacterPresentationRead = Field(default_factory=CharacterPresentationRead)
     created_at: datetime
     updated_at: datetime

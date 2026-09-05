@@ -73,3 +73,5 @@ class EditorMetaRead(BaseModel):
     story_node_types: list[TypeMeta]
     story_condition_types: list[TypeMeta]
     story_action_types: list[TypeMeta]
+    resource_types: list[TypeMeta]
+    mesh_formats: list[TypeMeta]

@@ -32,6 +32,7 @@ from backend.domain.skill_rules import (
     SkillType,
 )
 from backend.domain.source_types import SOURCE_TYPE_LABELS_ZH, SourceType, is_fact_eligible
+from backend.domain.asset_rules import MESH_FORMAT_LABELS_ZH, RESOURCE_TYPE_LABELS_ZH, MeshFormat, ResourceType
 from backend.domain.story_rules import (
     STORY_ACTION_TYPE_LABELS_ZH,
     STORY_CONDITION_TYPE_LABELS_ZH,
@@ -110,5 +111,7 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
         story_action_types=[
             TypeMeta(code=item.value, name_zh=STORY_ACTION_TYPE_LABELS_ZH[item]) for item in StoryActionType
         ],
+        resource_types=[TypeMeta(code=item.value, name_zh=RESOURCE_TYPE_LABELS_ZH[item]) for item in ResourceType],
+        mesh_formats=[TypeMeta(code=item.value, name_zh=MESH_FORMAT_LABELS_ZH[item]) for item in MeshFormat],
     )
     return ApiResponse(data=data)

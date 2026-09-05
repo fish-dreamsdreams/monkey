@@ -13,6 +13,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.models.base import Base
 
 if TYPE_CHECKING:
+    from backend.models.asset import Resource
     from backend.models.map import GameMap
     from backend.models.project import Project
 
@@ -38,6 +39,11 @@ class City(Base):
     military: Mapped[int] = mapped_column(Integer, nullable=False, default=50)
     economy: Mapped[int] = mapped_column(Integer, nullable=False, default=50)
     defense: Mapped[int] = mapped_column(Integer, nullable=False, default=50)
+    icon_asset_id: Mapped[str | None] = mapped_column(
+        ForeignKey("resources.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
     project: Mapped[Project] = relationship(back_populates="cities")
     game_map: Mapped[GameMap | None] = relationship(back_populates="cities")
+    icon_asset: Mapped[Resource | None] = relationship(foreign_keys=[icon_asset_id])

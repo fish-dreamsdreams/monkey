@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanguo-editor.local/schema/resource.schema.json",
+  "title": "ResourceExport",
+  "description": "资源导出契约。schema_version=1.9.0。人物通过 portrait_asset_id / model_asset_id 引用，不存裸路径。",
+  "type": "object",
+  "required": ["schema_version", "id", "code", "name", "resource_type", "path", "checksum"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.9.0" },
+    "id": { "type": "string" },
+    "code": { "type": "string" },
+    "name": { "type": "string" },
+    "resource_type": {
+      "enum": ["portrait", "icon", "texture", "model", "animation", "audio", "map_preview", "other"]
+    },
+    "path": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "checksum": { "type": "string", "minLength": 64, "maxLength": 64 },
+    "byte_size": { "type": "integer", "minimum": 0 },
+    "mime_type": { "type": ["string", "null"] },
+    "preview_path": { "type": ["string", "null"] },
+    "model": {
+      "type": ["object", "null"],
+      "properties": {
+        "mesh_format": { "enum": ["gltf", "glb", "fbx", "obj", "vrm"] },
+        "lod_count": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "animation_set_note": { "type": ["string", "null"] },
+        "skeleton_note": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

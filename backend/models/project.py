@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from backend.models.character import Character
     from backend.models.personality import PersonalityTag
     from backend.models.relationship import CharacterRelationship
+    from backend.models.skill import Skill
     from backend.models.source import Source
 
 
@@ -30,7 +31,7 @@ class Project(Base):
     code: Mapped[str] = mapped_column(String(64), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.3.0")
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.4.0")
     content_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     target_start_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     target_end_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -46,3 +47,4 @@ class Project(Base):
     personality_tags: Mapped[list[PersonalityTag]] = relationship(back_populates="project")
     sources: Mapped[list[Source]] = relationship(back_populates="project")
     relationships: Mapped[list[CharacterRelationship]] = relationship(back_populates="project")
+    skills: Mapped[list[Skill]] = relationship(back_populates="project")

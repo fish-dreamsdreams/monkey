@@ -1,18 +1,17 @@
 # 三国游戏内容编辑器
 
-Phase 4：人物关系（类型、时段、双向一致性）。
+Phase 5：技能系统（定义 + 人物绑定，效果仅为数据）。
 
 编辑器只负责创建、编辑、校验、保存内容数据。战斗、AI、动画留给未来游戏客户端。
 
 ## 设计要点
 
 - 工作库：MySQL 8（SQLAlchemy 2 异步）
-- 人物分栏：`base` / `historical` / `game`；演义不得写入史实栏
-- 关系是有向边：`from_character` → `to_character`
-- 对称类型（血缘、婚姻、结义、仇敌、同盟）自动写反向边
-- 不对称类型（君臣、主从、师徒）：`from` 为上位（君/主/师）
-- 同一对人物、同一类型，时段重叠则拒绝
-- 主键前缀：`prj_` / `chr_` / `src_` / `cit_` / `rel_`
+- 技能属于游戏层：`effects` 是 JSON payload，客户端解释执行
+- 编辑器**不**实现伤害公式、冷却倒计时或脚本求值
+- 演义技能用 `historical_basis.source_type = literary`，不得写进人物 `historical`
+- 人物通过 `character_skills` 绑定技能与等级
+- 主键前缀：`skl_` 技能，`csk_` 人物技能绑定
 
 ## 环境要求
 
@@ -50,12 +49,12 @@ uvicorn backend.main:app --reload --port 8000
 
 ## 验证
 
-1. `GET /api/v1/meta` 中 `schema_version` 为 `1.3.0`，`alembic_script_head` 为 `0004_phase4`
-2. 刘备 → 关羽 `sworn` 后，关羽的关系图也能看到刘备
-3. 同一对、同一类型、年份重叠 → 409
-4. 不同时段的两段结义可以并存
-5. 刘备 → 诸葛亮 `ruler_subject` 后，诸葛亮侧为 `incoming`
-6. 人物不能与自己建立关系
+1. `GET /api/v1/meta` 中 `schema_version` 为 `1.4.0`，`alembic_script_head` 为 `0005_phase5`
+2. 创建「空城计」，`historical_basis.source_type=literary`
+3. 绑到刘备后，人物 `historical.biography` 不会出现该技能
+4. `effects` 缺少 `modify_stat.stat` → 422
+5. `type=eval_script` → 422
+6. 同一人物重复绑定同一技能 → 409
 
 ## 测试
 
@@ -67,4 +66,4 @@ pytest -q
 
 ## 当前阶段不做
 
-技能、城池、势力、地图、事件、剧情、资源管理、完整导入导出、React 界面。
+城池、势力、地图、事件、剧情、资源管理、完整导入导出、React 界面、战斗结算。

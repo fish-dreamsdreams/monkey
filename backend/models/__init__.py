@@ -5,6 +5,7 @@ from backend.models.character import Character, CharacterAttribute, CharacterHis
 from backend.models.personality import CharacterPersonality, PersonalityTag
 from backend.models.project import Project
 from backend.models.relationship import CharacterRelationship
+from backend.models.skill import CharacterSkill, Skill
 from backend.models.source import CharacterSource, Source
 
 __all__ = [
@@ -18,4 +19,6 @@ __all__ = [
     "Source",
     "CharacterSource",
     "CharacterRelationship",
+    "Skill",
+    "CharacterSkill",
 ]

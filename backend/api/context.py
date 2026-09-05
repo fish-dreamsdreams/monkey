@@ -44,6 +44,16 @@ def valid_relationship_id(relationship_id: str) -> str:
     return require_id(relationship_id, EntityPrefix.RELATIONSHIP, field="relationship_id")
 
 
+def valid_skill_id(skill_id: str) -> str:
+    """校验路径参数 skill_id。"""
+    return require_id(skill_id, EntityPrefix.SKILL, field="skill_id")
+
+
+def valid_character_skill_id(binding_id: str) -> str:
+    """校验路径参数 binding_id（人物技能绑定）。"""
+    return require_id(binding_id, EntityPrefix.CHARACTER_SKILL, field="binding_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

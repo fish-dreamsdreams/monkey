@@ -10,10 +10,17 @@ from backend.domain.relationship_types import (
     RelationshipType,
     is_symmetric,
 )
+from backend.domain.skill_rules import (
+    EFFECT_TYPE_LABELS_ZH,
+    SKILL_TYPE_LABELS_ZH,
+    SkillEffectType,
+    SkillType,
+)
 from backend.domain.source_types import SOURCE_TYPE_LABELS_ZH, SourceType, is_fact_eligible
 from backend.schemas.common import ApiResponse
 from backend.schemas.project import EditorMetaRead
 from backend.schemas.relationship import RelationshipTypeMeta
+from backend.schemas.skill import SkillTypeMeta
 from backend.schemas.source import SourceTypeMeta
 
 router = APIRouter(tags=["meta"])
@@ -43,6 +50,12 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
                 symmetric=is_symmetric(item),
             )
             for item in RelationshipType
+        ],
+        skill_types=[
+            SkillTypeMeta(code=item.value, name_zh=SKILL_TYPE_LABELS_ZH[item]) for item in SkillType
+        ],
+        effect_types=[
+            SkillTypeMeta(code=item.value, name_zh=EFFECT_TYPE_LABELS_ZH[item]) for item in SkillEffectType
         ],
     )
     return ApiResponse(data=data)

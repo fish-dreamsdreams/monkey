@@ -25,6 +25,8 @@ class EntityPrefix(str, Enum):
     SOURCE = "src"
     CITATION = "cit"
     RELATIONSHIP = "rel"
+    SKILL = "skl"
+    CHARACTER_SKILL = "csk"
 
 
 def new_id(prefix: EntityPrefix) -> str:

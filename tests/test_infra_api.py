@@ -17,11 +17,14 @@ async def test_health_and_meta(client: AsyncClient) -> None:
     assert meta.status_code == 200
     body = meta.json()["data"]
     assert body["schema_version"] == CURRENT_SCHEMA_VERSION
-    assert body["alembic_script_head"] == "0004_phase4"
+    assert body["alembic_script_head"] == "0005_phase5"
     assert body["id_prefixes"]["project"] == "prj"
     assert body["id_prefixes"]["character"] == "chr"
     assert body["id_prefixes"]["source"] == "src"
     assert body["id_prefixes"]["relationship"] == "rel"
+    assert body["id_prefixes"]["skill"] == "skl"
+    assert any(item["code"] == "command" for item in body["skill_types"])
+    assert any(item["code"] == "modify_stat" for item in body["effect_types"])
     assert any(item["code"] == "literary" and item["fact_eligible"] is False for item in body["source_types"])
     assert any(item["code"] == "sworn" and item["symmetric"] is True for item in body["relationship_types"])
     assert any(item["code"] == "ruler_subject" and item["symmetric"] is False for item in body["relationship_types"])

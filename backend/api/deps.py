@@ -7,10 +7,12 @@ from backend.core.db import get_db
 from backend.repositories.character_repository import CharacterRepository
 from backend.repositories.project_repository import ProjectRepository
 from backend.repositories.relationship_repository import RelationshipRepository
+from backend.repositories.skill_repository import SkillRepository
 from backend.repositories.source_repository import SourceRepository
 from backend.services.character_service import CharacterService
 from backend.services.project_service import ProjectService
 from backend.services.relationship_service import RelationshipService
+from backend.services.skill_service import SkillService
 from backend.services.source_service import SourceService
 
 
@@ -39,4 +41,14 @@ def get_relationship_service(session: AsyncSession = Depends(get_db)) -> Relatio
         RelationshipRepository(session),
         CharacterRepository(session),
         ProjectRepository(session),
+    )
+
+
+def get_skill_service(session: AsyncSession = Depends(get_db)) -> SkillService:
+    """构造技能服务。"""
+    return SkillService(
+        SkillRepository(session),
+        CharacterRepository(session),
+        ProjectRepository(session),
+        SourceRepository(session),
     )

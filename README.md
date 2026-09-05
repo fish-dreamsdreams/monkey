@@ -30,6 +30,16 @@ alembic upgrade head
 uvicorn backend.main:app --reload
 ```
 
+另开终端启动前端：
+
+```powershell
+cd editor
+npm install
+npm run dev
+```
+
+浏览器打开 http://127.0.0.1:5173 。Vite 把 `/api` 与 `/health` 代理到 FastAPI。
+
 ## 当前验收
 
 1. `GET /api/v1/meta` 中 `schema_version` 与 `frozen_client_schema_version` 均为 `1.12.0`，Alembic 仍为 `0010_phase10`

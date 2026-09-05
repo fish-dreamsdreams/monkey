@@ -4,6 +4,7 @@
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.error_handlers import register_error_handlers
 from backend.api.router import api_router
@@ -13,7 +14,17 @@ from backend.schemas.common import ApiResponse
 app = FastAPI(
     title="三国内容编辑器",
     version=API_VERSION,
-    description="Phase 2：公共基础设施。人物史实与游戏设定分栏存储。",
+    description="内容编辑器 API。前端位于 editor/，战斗留给游戏客户端。",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 register_error_handlers(app)
 app.include_router(api_router, prefix="/api/v1")

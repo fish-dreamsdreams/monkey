@@ -7,6 +7,7 @@ from backend.core.db import get_db
 from backend.repositories.character_repository import CharacterRepository
 from backend.repositories.city_repository import CityRepository
 from backend.repositories.faction_repository import FactionRepository
+from backend.repositories.map_repository import MapRepository
 from backend.repositories.project_repository import ProjectRepository
 from backend.repositories.relationship_repository import RelationshipRepository
 from backend.repositories.skill_repository import SkillRepository
@@ -14,6 +15,7 @@ from backend.repositories.source_repository import SourceRepository
 from backend.services.character_service import CharacterService
 from backend.services.city_service import CityService
 from backend.services.faction_service import FactionService
+from backend.services.map_service import MapService
 from backend.services.project_service import ProjectService
 from backend.services.relationship_service import RelationshipService
 from backend.services.skill_service import SkillService
@@ -78,4 +80,13 @@ def get_faction_service(session: AsyncSession = Depends(get_db)) -> FactionServi
         CharacterRepository(session),
         projects,
         CityService(city_repo, faction_repo, projects),
+    )
+
+
+def get_map_service(session: AsyncSession = Depends(get_db)) -> MapService:
+    """构造地图服务。"""
+    return MapService(
+        MapRepository(session),
+        CityRepository(session),
+        ProjectRepository(session),
     )

@@ -74,6 +74,16 @@ def valid_faction_territory_id(territory_id: str) -> str:
     return require_id(territory_id, EntityPrefix.FACTION_TERRITORY, field="territory_id")
 
 
+def valid_map_id(map_id: str) -> str:
+    """校验路径参数 map_id。"""
+    return require_id(map_id, EntityPrefix.MAP, field="map_id")
+
+
+def valid_map_feature_id(feature_id: str) -> str:
+    """校验路径参数 feature_id。"""
+    return require_id(feature_id, EntityPrefix.MAP_FEATURE, field="feature_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

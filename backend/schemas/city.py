@@ -59,6 +59,7 @@ class CityRead(BaseModel):
 
     id: str
     project_id: str
+    map_id: str | None = None
     code: str
     name: str
     coord_x: int | None

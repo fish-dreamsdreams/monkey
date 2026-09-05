@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanguo-editor.local/schema/map.schema.json",
+  "title": "MapExport",
+  "description": "地图导出契约。schema_version=1.6.0。地形为稀疏覆盖；未列出的格子使用 default_terrain。编辑器不渲染 Canvas。",
+  "type": "object",
+  "required": ["schema_version", "id", "code", "name", "width", "height"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.6.0" },
+    "id": { "type": "string" },
+    "code": { "type": "string" },
+    "name": { "type": "string" },
+    "width": { "type": "integer", "minimum": 4, "maximum": 256 },
+    "height": { "type": "integer", "minimum": 4, "maximum": 256 },
+    "cell_size": { "type": "integer" },
+    "default_terrain": {
+      "enum": ["plain", "forest", "hill", "mountain", "water", "swamp", "desert", "pass", "farmland", "urban"]
+    },
+    "description": { "type": ["string", "null"] },
+    "terrain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["x", "y", "terrain"],
+        "properties": {
+          "x": { "type": "integer" },
+          "y": { "type": "integer" },
+          "terrain": { "type": "string" }
+        }
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "name", "feature_type", "points"],
+        "properties": {
+          "code": { "type": "string" },
+          "name": { "type": "string" },
+          "feature_type": { "enum": ["region", "road", "river", "mountain"] },
+          "points": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "required": ["x", "y"],
+              "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" }
+              }
+            }
+          },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "cities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["city_id", "coord_x", "coord_y"],
+        "properties": {
+          "city_id": { "type": "string" },
+          "coord_x": { "type": "integer" },
+          "coord_y": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

@@ -11,6 +11,12 @@ from backend.domain.relationship_types import (
     is_symmetric,
 )
 from backend.domain.faction_rules import FACTION_MEMBER_ROLE_LABELS_ZH, FactionMemberRole
+from backend.domain.map_rules import (
+    MAP_FEATURE_TYPE_LABELS_ZH,
+    TERRAIN_TYPE_LABELS_ZH,
+    MapFeatureType,
+    TerrainType,
+)
 from backend.domain.skill_rules import (
     EFFECT_TYPE_LABELS_ZH,
     SKILL_TYPE_LABELS_ZH,
@@ -21,6 +27,7 @@ from backend.domain.source_types import SOURCE_TYPE_LABELS_ZH, SourceType, is_fa
 from backend.schemas.common import ApiResponse
 from backend.schemas.project import EditorMetaRead
 from backend.schemas.faction import MemberRoleMeta
+from backend.schemas.map import TypeMeta
 from backend.schemas.relationship import RelationshipTypeMeta
 from backend.schemas.skill import SkillTypeMeta
 from backend.schemas.source import SourceTypeMeta
@@ -62,6 +69,12 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
         member_roles=[
             MemberRoleMeta(code=item.value, name_zh=FACTION_MEMBER_ROLE_LABELS_ZH[item])
             for item in FactionMemberRole
+        ],
+        terrain_types=[
+            TypeMeta(code=item.value, name_zh=TERRAIN_TYPE_LABELS_ZH[item]) for item in TerrainType
+        ],
+        map_feature_types=[
+            TypeMeta(code=item.value, name_zh=MAP_FEATURE_TYPE_LABELS_ZH[item]) for item in MapFeatureType
         ],
     )
     return ApiResponse(data=data)

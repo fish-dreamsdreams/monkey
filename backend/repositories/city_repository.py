@@ -39,6 +39,24 @@ class CityRepository:
         )
         return list(result.scalars().all())
 
+    async def list_by_map(self, map_id: str) -> list[City]:
+        """列出挂在某地图上的城池。"""
+        result = await self._session.execute(
+            select(City).where(City.map_id == map_id).order_by(City.name, City.code)
+        )
+        return list(result.scalars().all())
+
+    async def get_at_cell(self, map_id: str, coord_x: int, coord_y: int) -> City | None:
+        """查找某格子上的城池。"""
+        result = await self._session.execute(
+            select(City).where(
+                City.map_id == map_id,
+                City.coord_x == coord_x,
+                City.coord_y == coord_y,
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def delete(self, city: City) -> None:
         """删除城池。"""
         await self._session.delete(city)

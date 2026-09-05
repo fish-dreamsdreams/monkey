@@ -89,6 +89,7 @@ class CityService:
         return CityRead(
             id=city.id,
             project_id=city.project_id,
+            map_id=city.map_id,
             code=city.code,
             name=city.name,
             coord_x=city.coord_x,

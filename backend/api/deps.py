@@ -13,6 +13,7 @@ from backend.repositories.project_repository import ProjectRepository
 from backend.repositories.relationship_repository import RelationshipRepository
 from backend.repositories.skill_repository import SkillRepository
 from backend.repositories.source_repository import SourceRepository
+from backend.repositories.story_repository import StoryRepository
 from backend.services.character_service import CharacterService
 from backend.services.city_service import CityService
 from backend.services.event_service import EventService
@@ -22,6 +23,7 @@ from backend.services.project_service import ProjectService
 from backend.services.relationship_service import RelationshipService
 from backend.services.skill_service import SkillService
 from backend.services.source_service import SourceService
+from backend.services.story_service import StoryService
 
 
 def get_project_service(session: AsyncSession = Depends(get_db)) -> ProjectService:
@@ -102,5 +104,17 @@ def get_event_service(session: AsyncSession = Depends(get_db)) -> EventService:
         CityRepository(session),
         FactionRepository(session),
         SourceRepository(session),
+        ProjectRepository(session),
+    )
+
+
+def get_story_service(session: AsyncSession = Depends(get_db)) -> StoryService:
+    """构造剧情服务。"""
+    return StoryService(
+        StoryRepository(session),
+        CharacterRepository(session),
+        CityRepository(session),
+        FactionRepository(session),
+        EventRepository(session),
         ProjectRepository(session),
     )

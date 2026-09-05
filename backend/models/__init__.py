@@ -11,6 +11,16 @@ from backend.models.project import Project
 from backend.models.relationship import CharacterRelationship
 from backend.models.skill import CharacterSkill, Skill
 from backend.models.source import CharacterSource, Source
+from backend.models.story import (
+    Story,
+    StoryAction,
+    StoryChapter,
+    StoryChoice,
+    StoryCondition,
+    StoryEdge,
+    StoryNode,
+    StoryNodeCharacter,
+)
 
 __all__ = [
     "Base",
@@ -36,4 +46,12 @@ __all__ = [
     "EventParticipant",
     "EventFaction",
     "EventSource",
+    "Story",
+    "StoryChapter",
+    "StoryNode",
+    "StoryEdge",
+    "StoryChoice",
+    "StoryCondition",
+    "StoryAction",
+    "StoryNodeCharacter",
 ]

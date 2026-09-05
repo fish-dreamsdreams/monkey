@@ -17,7 +17,7 @@ async def test_health_and_meta(client: AsyncClient) -> None:
     assert meta.status_code == 200
     body = meta.json()["data"]
     assert body["schema_version"] == CURRENT_SCHEMA_VERSION
-    assert body["alembic_script_head"] == "0008_phase8"
+    assert body["alembic_script_head"] == "0009_phase9"
     assert body["id_prefixes"]["project"] == "prj"
     assert body["id_prefixes"]["character"] == "chr"
     assert body["id_prefixes"]["source"] == "src"
@@ -27,7 +27,9 @@ async def test_health_and_meta(client: AsyncClient) -> None:
     assert body["id_prefixes"]["faction"] == "fac"
     assert body["id_prefixes"]["map"] == "map"
     assert body["id_prefixes"]["event"] == "evt"
+    assert body["id_prefixes"]["story"] == "sty"
     assert any(item["code"] == "battle" for item in body["event_types"])
+    assert any(item["code"] == "dialogue" for item in body["story_node_types"])
     assert any(item["code"] == "leader" for item in body["member_roles"])
     assert any(item["code"] == "water" for item in body["terrain_types"])
     assert any(item["code"] == "river" for item in body["map_feature_types"])

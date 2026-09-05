@@ -32,6 +32,14 @@ from backend.domain.skill_rules import (
     SkillType,
 )
 from backend.domain.source_types import SOURCE_TYPE_LABELS_ZH, SourceType, is_fact_eligible
+from backend.domain.story_rules import (
+    STORY_ACTION_TYPE_LABELS_ZH,
+    STORY_CONDITION_TYPE_LABELS_ZH,
+    STORY_NODE_TYPE_LABELS_ZH,
+    StoryActionType,
+    StoryConditionType,
+    StoryNodeType,
+)
 from backend.schemas.common import ApiResponse
 from backend.schemas.project import EditorMetaRead
 from backend.schemas.faction import MemberRoleMeta
@@ -91,6 +99,16 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
         ],
         event_faction_roles=[
             TypeMeta(code=item.value, name_zh=EVENT_FACTION_ROLE_LABELS_ZH[item]) for item in EventFactionRole
+        ],
+        story_node_types=[
+            TypeMeta(code=item.value, name_zh=STORY_NODE_TYPE_LABELS_ZH[item]) for item in StoryNodeType
+        ],
+        story_condition_types=[
+            TypeMeta(code=item.value, name_zh=STORY_CONDITION_TYPE_LABELS_ZH[item])
+            for item in StoryConditionType
+        ],
+        story_action_types=[
+            TypeMeta(code=item.value, name_zh=STORY_ACTION_TYPE_LABELS_ZH[item]) for item in StoryActionType
         ],
     )
     return ApiResponse(data=data)

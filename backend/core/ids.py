@@ -38,6 +38,14 @@ class EntityPrefix(str, Enum):
     EVENT_PARTICIPANT = "evp"
     EVENT_FACTION = "evf"
     EVENT_SOURCE = "evs"
+    STORY = "sty"
+    STORY_CHAPTER = "chp"
+    STORY_NODE = "snd"
+    STORY_EDGE = "sed"
+    STORY_CHOICE = "cho"
+    STORY_CONDITION = "cnd"
+    STORY_ACTION = "act"
+    STORY_NODE_CHARACTER = "snc"
 
 
 def new_id(prefix: EntityPrefix) -> str:

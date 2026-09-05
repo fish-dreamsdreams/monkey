@@ -104,6 +104,46 @@ def valid_event_source_id(citation_id: str) -> str:
     return require_id(citation_id, EntityPrefix.EVENT_SOURCE, field="citation_id")
 
 
+def valid_story_id(story_id: str) -> str:
+    """校验路径参数 story_id。"""
+    return require_id(story_id, EntityPrefix.STORY, field="story_id")
+
+
+def valid_story_chapter_id(chapter_id: str) -> str:
+    """校验路径参数 chapter_id。"""
+    return require_id(chapter_id, EntityPrefix.STORY_CHAPTER, field="chapter_id")
+
+
+def valid_story_node_id(node_id: str) -> str:
+    """校验路径参数 node_id。"""
+    return require_id(node_id, EntityPrefix.STORY_NODE, field="node_id")
+
+
+def valid_story_edge_id(edge_id: str) -> str:
+    """校验路径参数 edge_id。"""
+    return require_id(edge_id, EntityPrefix.STORY_EDGE, field="edge_id")
+
+
+def valid_story_choice_id(choice_id: str) -> str:
+    """校验路径参数 choice_id。"""
+    return require_id(choice_id, EntityPrefix.STORY_CHOICE, field="choice_id")
+
+
+def valid_story_condition_id(condition_id: str) -> str:
+    """校验路径参数 condition_id。"""
+    return require_id(condition_id, EntityPrefix.STORY_CONDITION, field="condition_id")
+
+
+def valid_story_action_id(action_id: str) -> str:
+    """校验路径参数 action_id。"""
+    return require_id(action_id, EntityPrefix.STORY_ACTION, field="action_id")
+
+
+def valid_story_cast_id(cast_id: str) -> str:
+    """校验路径参数 cast_id。"""
+    return require_id(cast_id, EntityPrefix.STORY_NODE_CHARACTER, field="cast_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

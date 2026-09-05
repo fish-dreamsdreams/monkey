@@ -70,3 +70,6 @@ class EditorMetaRead(BaseModel):
     event_types: list[TypeMeta]
     participant_roles: list[TypeMeta]
     event_faction_roles: list[TypeMeta]
+    story_node_types: list[TypeMeta]
+    story_condition_types: list[TypeMeta]
+    story_action_types: list[TypeMeta]

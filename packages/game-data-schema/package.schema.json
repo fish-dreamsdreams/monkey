@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanguo-editor.local/schema/package.schema.json",
+  "title": "GameDataPackage",
+  "description": "客户端可读项目包。schema_version=1.11.0。不含 quests/timeline。导出前必须通过 ValidationEngine。",
+  "type": "object",
+  "required": ["manifest", "project", "characters", "cities", "factions", "maps", "skills", "events", "stories", "relationships", "resources"],
+  "properties": {
+    "manifest": {
+      "type": "object",
+      "required": ["schema_version", "content_version", "files"],
+      "properties": {
+        "schema_version": { "type": "string", "const": "1.11.0" },
+        "content_version": { "type": "integer", "minimum": 1 },
+        "exported_at": { "type": "string", "format": "date-time" },
+        "validation_mode": { "enum": ["strict_historical", "game_narrative"] },
+        "project_code": { "type": "string" },
+        "project_name": { "type": "string" },
+        "files": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "project": { "type": "object" },
+    "personality_tags": { "type": "array" },
+    "sources": { "type": "array" },
+    "characters": { "type": "array" },
+    "relationships": { "type": "array" },
+    "skills": { "type": "array" },
+    "character_skills": { "type": "array" },
+    "maps": { "type": "array" },
+    "cities": { "type": "array" },
+    "factions": { "type": "array" },
+    "events": { "type": "array" },
+    "stories": { "type": "array" },
+    "resources": { "type": "array" }
+  },
+  "additionalProperties": false
+}

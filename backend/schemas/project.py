@@ -76,3 +76,4 @@ class EditorMetaRead(BaseModel):
     resource_types: list[TypeMeta]
     mesh_formats: list[TypeMeta]
     validation_modes: list[TypeMeta]
+    package_files: list[str]

@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from backend.core.alembic_runtime import script_head_revision
 from backend.core.ids import EntityPrefix
 from backend.core.schema_version import API_VERSION, CURRENT_SCHEMA_VERSION, SUPPORTED_SCHEMA_VERSIONS
+from backend.domain.export_rules import PACKAGE_SECTION_FILES
 from backend.domain.relationship_types import (
     RELATIONSHIP_TYPE_LABELS_ZH,
     RelationshipType,
@@ -117,5 +118,6 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
         validation_modes=[
             TypeMeta(code=item.value, name_zh=VALIDATION_MODE_LABELS_ZH[item]) for item in ValidationMode
         ],
+        package_files=list(PACKAGE_SECTION_FILES),
     )
     return ApiResponse(data=data)

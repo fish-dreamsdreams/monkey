@@ -26,6 +26,7 @@ from backend.services.project_service import ProjectService
 from backend.services.relationship_service import RelationshipService
 from backend.services.skill_service import SkillService
 from backend.services.source_service import SourceService
+from backend.services.export_service import ExportService
 from backend.services.story_service import StoryService
 
 
@@ -146,4 +147,35 @@ def get_story_service(session: AsyncSession = Depends(get_db)) -> StoryService:
         FactionRepository(session),
         EventRepository(session),
         ProjectRepository(session),
+    )
+
+
+def get_export_service(
+    projects: ProjectService = Depends(get_project_service),
+    sources: SourceService = Depends(get_source_service),
+    characters: CharacterService = Depends(get_character_service),
+    relationships: RelationshipService = Depends(get_relationship_service),
+    skills: SkillService = Depends(get_skill_service),
+    cities: CityService = Depends(get_city_service),
+    factions: FactionService = Depends(get_faction_service),
+    maps: MapService = Depends(get_map_service),
+    events: EventService = Depends(get_event_service),
+    stories: StoryService = Depends(get_story_service),
+    assets: AssetService = Depends(get_asset_service),
+    validation: ValidationService = Depends(get_validation_service),
+) -> ExportService:
+    """构造导入导出服务。"""
+    return ExportService(
+        projects,
+        sources,
+        characters,
+        relationships,
+        skills,
+        cities,
+        factions,
+        maps,
+        events,
+        stories,
+        assets,
+        validation,
     )

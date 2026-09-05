@@ -12,11 +12,18 @@ class AppError(Exception):
     http_status: int = 400
     default_code: str = ErrorCode.APP_ERROR.value
 
-    def __init__(self, message: str, code: str | None = None, field: str | None = None) -> None:
+    def __init__(
+        self,
+        message: str,
+        code: str | None = None,
+        field: str | None = None,
+        details: list[dict[str, str]] | None = None,
+    ) -> None:
         super().__init__(message)
         self.message = message
         self.code = code or self.default_code
         self.field = field
+        self.details = details
 
 
 class NotFoundError(AppError):
@@ -67,3 +74,13 @@ class UnsupportedSchemaError(AppError):
 
     def __init__(self, message: str) -> None:
         super().__init__(message)
+
+
+class ExportBlockedError(AppError):
+    """校验未通过，禁止导出客户端包。"""
+
+    http_status = 409
+    default_code = ErrorCode.EXPORT_BLOCKED.value
+
+    def __init__(self, details: list[dict[str, str]]) -> None:
+        super().__init__("校验未通过，不能导出", details=details)

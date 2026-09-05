@@ -15,5 +15,6 @@ class ErrorCode(str, Enum):
     VALIDATION_ERROR = "validation_error"
     INVALID_ID = "invalid_id"
     UNSUPPORTED_SCHEMA = "unsupported_schema"
+    EXPORT_BLOCKED = "export_blocked"
     REQUEST_VALIDATION_ERROR = "request_validation_error"
     INTERNAL_ERROR = "internal_error"

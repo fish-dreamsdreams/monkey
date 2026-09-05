@@ -13,3 +13,8 @@ PROJECT_ASSETS_ROOT = REPO_ROOT / "var" / "projects"
 def project_assets_dir(project_id: str) -> Path:
     """用户项目资源根目录。不是编辑器自身 assets。"""
     return PROJECT_ASSETS_ROOT / project_id / "assets"
+
+
+def project_export_dir(project_id: str, content_version: int) -> Path:
+    """面向客户端的冻结导出目录。"""
+    return PROJECT_ASSETS_ROOT / project_id / "exports" / f"v{content_version}"

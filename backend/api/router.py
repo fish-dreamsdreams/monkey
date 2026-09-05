@@ -6,6 +6,7 @@ from backend.api.assets import router as assets_router
 from backend.api.characters import router as characters_router
 from backend.api.cities import router as cities_router
 from backend.api.events import router as events_router
+from backend.api.export import router as export_router
 from backend.api.factions import router as factions_router
 from backend.api.maps import router as maps_router
 from backend.api.meta import router as meta_router
@@ -29,4 +30,5 @@ api_router.include_router(events_router)
 api_router.include_router(stories_router)
 api_router.include_router(assets_router)
 api_router.include_router(validation_router)
+api_router.include_router(export_router)
 api_router.include_router(characters_router)

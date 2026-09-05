@@ -35,7 +35,12 @@ def register_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(AppError)
     async def app_error_handler(_request: Request, exc: AppError) -> JSONResponse:
-        details = [FieldError(field=exc.field, message=exc.message)] if exc.field else None
+        if exc.details:
+            details = [FieldError(field=item["field"], message=item["message"]) for item in exc.details]
+        elif exc.field:
+            details = [FieldError(field=exc.field, message=exc.message)]
+        else:
+            details = None
         return JSONResponse(
             status_code=exc.http_status,
             content=error_payload(code=exc.code, message=exc.message, details=details),

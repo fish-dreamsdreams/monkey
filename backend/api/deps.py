@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.core.db import get_db
 from backend.repositories.character_repository import CharacterRepository
 from backend.repositories.city_repository import CityRepository
+from backend.repositories.event_repository import EventRepository
 from backend.repositories.faction_repository import FactionRepository
 from backend.repositories.map_repository import MapRepository
 from backend.repositories.project_repository import ProjectRepository
@@ -14,6 +15,7 @@ from backend.repositories.skill_repository import SkillRepository
 from backend.repositories.source_repository import SourceRepository
 from backend.services.character_service import CharacterService
 from backend.services.city_service import CityService
+from backend.services.event_service import EventService
 from backend.services.faction_service import FactionService
 from backend.services.map_service import MapService
 from backend.services.project_service import ProjectService
@@ -88,5 +90,17 @@ def get_map_service(session: AsyncSession = Depends(get_db)) -> MapService:
     return MapService(
         MapRepository(session),
         CityRepository(session),
+        ProjectRepository(session),
+    )
+
+
+def get_event_service(session: AsyncSession = Depends(get_db)) -> EventService:
+    """构造历史事件服务。"""
+    return EventService(
+        EventRepository(session),
+        CharacterRepository(session),
+        CityRepository(session),
+        FactionRepository(session),
+        SourceRepository(session),
         ProjectRepository(session),
     )

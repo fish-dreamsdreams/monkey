@@ -67,3 +67,6 @@ class EditorMetaRead(BaseModel):
     member_roles: list[MemberRoleMeta]
     terrain_types: list[TypeMeta]
     map_feature_types: list[TypeMeta]
+    event_types: list[TypeMeta]
+    participant_roles: list[TypeMeta]
+    event_faction_roles: list[TypeMeta]

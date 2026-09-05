@@ -84,6 +84,26 @@ def valid_map_feature_id(feature_id: str) -> str:
     return require_id(feature_id, EntityPrefix.MAP_FEATURE, field="feature_id")
 
 
+def valid_event_id(event_id: str) -> str:
+    """校验路径参数 event_id。"""
+    return require_id(event_id, EntityPrefix.EVENT, field="event_id")
+
+
+def valid_event_participant_id(participant_id: str) -> str:
+    """校验路径参数 participant_id。"""
+    return require_id(participant_id, EntityPrefix.EVENT_PARTICIPANT, field="participant_id")
+
+
+def valid_event_faction_id(link_id: str) -> str:
+    """校验路径参数 link_id。"""
+    return require_id(link_id, EntityPrefix.EVENT_FACTION, field="link_id")
+
+
+def valid_event_source_id(citation_id: str) -> str:
+    """校验路径参数 citation_id。"""
+    return require_id(citation_id, EntityPrefix.EVENT_SOURCE, field="citation_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

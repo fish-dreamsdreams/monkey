@@ -34,6 +34,10 @@ class EntityPrefix(str, Enum):
     MAP = "map"
     TERRAIN_CELL = "tcl"
     MAP_FEATURE = "mft"
+    EVENT = "evt"
+    EVENT_PARTICIPANT = "evp"
+    EVENT_FACTION = "evf"
+    EVENT_SOURCE = "evs"
 
 
 def new_id(prefix: EntityPrefix) -> str:

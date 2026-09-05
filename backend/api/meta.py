@@ -10,6 +10,14 @@ from backend.domain.relationship_types import (
     RelationshipType,
     is_symmetric,
 )
+from backend.domain.event_rules import (
+    EVENT_FACTION_ROLE_LABELS_ZH,
+    EVENT_PARTICIPANT_ROLE_LABELS_ZH,
+    EVENT_TYPE_LABELS_ZH,
+    EventFactionRole,
+    EventParticipantRole,
+    EventType,
+)
 from backend.domain.faction_rules import FACTION_MEMBER_ROLE_LABELS_ZH, FactionMemberRole
 from backend.domain.map_rules import (
     MAP_FEATURE_TYPE_LABELS_ZH,
@@ -75,6 +83,14 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
         ],
         map_feature_types=[
             TypeMeta(code=item.value, name_zh=MAP_FEATURE_TYPE_LABELS_ZH[item]) for item in MapFeatureType
+        ],
+        event_types=[TypeMeta(code=item.value, name_zh=EVENT_TYPE_LABELS_ZH[item]) for item in EventType],
+        participant_roles=[
+            TypeMeta(code=item.value, name_zh=EVENT_PARTICIPANT_ROLE_LABELS_ZH[item])
+            for item in EventParticipantRole
+        ],
+        event_faction_roles=[
+            TypeMeta(code=item.value, name_zh=EVENT_FACTION_ROLE_LABELS_ZH[item]) for item in EventFactionRole
         ],
     )
     return ApiResponse(data=data)

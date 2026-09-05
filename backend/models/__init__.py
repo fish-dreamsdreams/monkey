@@ -3,6 +3,7 @@
 from backend.models.base import Base
 from backend.models.character import Character, CharacterAttribute, CharacterHistoricalRecord
 from backend.models.city import City
+from backend.models.event import EventFaction, EventParticipant, EventSource, HistoricalEvent
 from backend.models.faction import Faction, FactionMember, FactionTerritory
 from backend.models.map import GameMap, MapFeature, TerrainCell
 from backend.models.personality import CharacterPersonality, PersonalityTag
@@ -31,4 +32,8 @@ __all__ = [
     "GameMap",
     "TerrainCell",
     "MapFeature",
+    "HistoricalEvent",
+    "EventParticipant",
+    "EventFaction",
+    "EventSource",
 ]

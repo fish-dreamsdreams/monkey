@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanguo-editor.local/schema/event.schema.json",
+  "title": "HistoricalEventExport",
+  "description": "历史事件导出契约。schema_version=1.7.0。consequences 仅为文本，编辑器不结算。参与者必须活在事件当年。",
+  "type": "object",
+  "required": ["schema_version", "id", "code", "name", "year"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.7.0" },
+    "id": { "type": "string" },
+    "code": { "type": "string" },
+    "name": { "type": "string" },
+    "event_type": {
+      "enum": ["battle", "siege", "diplomacy", "appointment", "death", "founding", "capture", "other"]
+    },
+    "layer": { "enum": ["historical", "literary", "game"] },
+    "year": { "type": "integer" },
+    "month": { "type": ["integer", "null"], "minimum": 1, "maximum": 12 },
+    "day": { "type": ["integer", "null"], "minimum": 1, "maximum": 31 },
+    "location_city_id": { "type": ["string", "null"] },
+    "location_note": { "type": ["string", "null"] },
+    "description": { "type": ["string", "null"] },
+    "consequences": { "type": ["string", "null"] },
+    "participants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["character_id", "role"],
+        "properties": {
+          "character_id": { "type": "string" },
+          "role": { "enum": ["commander", "participant", "victim", "witness", "envoy"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "factions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["faction_id", "role"],
+        "properties": {
+          "faction_id": { "type": "string" },
+          "role": { "enum": ["attacker", "defender", "host", "involved"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

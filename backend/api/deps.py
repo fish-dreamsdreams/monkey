@@ -16,6 +16,7 @@ from backend.repositories.skill_repository import SkillRepository
 from backend.repositories.source_repository import SourceRepository
 from backend.repositories.story_repository import StoryRepository
 from backend.services.asset_service import AssetService
+from backend.services.validation_service import ValidationService
 from backend.services.character_service import CharacterService
 from backend.services.city_service import CityService
 from backend.services.event_service import EventService
@@ -106,6 +107,20 @@ def get_event_service(session: AsyncSession = Depends(get_db)) -> EventService:
         CityRepository(session),
         FactionRepository(session),
         SourceRepository(session),
+        ProjectRepository(session),
+    )
+
+
+def get_validation_service(session: AsyncSession = Depends(get_db)) -> ValidationService:
+    """构造只读校验服务。"""
+    return ValidationService(
+        CharacterRepository(session),
+        CityRepository(session),
+        FactionRepository(session),
+        EventRepository(session),
+        RelationshipRepository(session),
+        StoryRepository(session),
+        AssetRepository(session),
         ProjectRepository(session),
     )
 

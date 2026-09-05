@@ -14,6 +14,7 @@ from backend.api.relationships import router as relationships_router
 from backend.api.skills import router as skills_router
 from backend.api.sources import router as sources_router
 from backend.api.stories import router as stories_router
+from backend.api.validation import router as validation_router
 
 api_router = APIRouter()
 api_router.include_router(meta_router)
@@ -27,4 +28,5 @@ api_router.include_router(maps_router)
 api_router.include_router(events_router)
 api_router.include_router(stories_router)
 api_router.include_router(assets_router)
+api_router.include_router(validation_router)
 api_router.include_router(characters_router)

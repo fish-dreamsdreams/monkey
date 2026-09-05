@@ -46,6 +46,16 @@ class EventRepository:
         )
         return result.scalar_one_or_none()
 
+    async def list_for_validation(self, project_id: str) -> list[HistoricalEvent]:
+        """加载事件聚合，供跨实体校验。"""
+        result = await self._session.execute(
+            select(HistoricalEvent)
+            .options(*self._detail_options())
+            .where(HistoricalEvent.project_id == project_id)
+            .order_by(HistoricalEvent.year, HistoricalEvent.code)
+        )
+        return list(result.scalars().all())
+
     async def list_by_project(
         self,
         project_id: str,

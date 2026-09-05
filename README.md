@@ -1,16 +1,17 @@
 # 三国游戏内容编辑器
 
-Phase 10：资源/模型管理（路径存在性、人物绑定模型）。
+Phase 11：跨实体数据校验引擎（时间线、易主、死循环）。
 
 编辑器只负责创建、编辑、校验、保存内容数据。战斗、AI、动画留给未来游戏客户端。
 
 ## 设计要点
 
 - 工作库：MySQL 8（SQLAlchemy 2 异步）
-- 资源只存相对路径、类型、checksum；人物通过 `portrait_asset_id` / `model_asset_id` 引用，**不**把裸路径写进人物表
-- 登记时文件必须存在于项目 `assets` 下；禁止 `..` 与绝对路径
-- 模型资源带 `ModelAsset` 扩展（格式/LOD），不加载网格、不播放动画
-- 主键前缀：`res_` 资源，`mas_` 模型扩展
+- `GET /projects/{id}/validation` 扫描全项目，写服务**不**反向依赖引擎
+- 两种模式：`strict_historical`（默认）与 `game_narrative`
+- 传说例外必须标注 `source_type`，且只在叙事模式下降为警告
+- 城池归属时段不可重叠；剧情无条件边禁止成环
+- 报告始终 200；`valid=false` 表示不能导出
 
 ## 环境要求
 
@@ -48,11 +49,11 @@ uvicorn backend.main:app --reload --port 8000
 
 ## 验证
 
-1. `GET /api/v1/meta` 中 `schema_version` 为 `1.9.0`，`alembic_script_head` 为 `0010_phase10`
-2. 登记刘备头像：相对路径存在且 checksum 匹配
-3. `../` 或绝对路径返回 400
-4. 把头像/模型绑到刘备后，人物详情 `presentation` 只有资源 ID，没有磁盘绝对路径
-5. 不能把模型资源当头像绑定
+1. `GET /api/v1/meta` 中 `schema_version` 为 `1.10.0`，`alembic_script_head` 仍为 `0010_phase10`
+2. 空项目校验 `valid=true`
+3. 无结束节点的剧情草稿报告 `story_graph`
+4. 同一城池重叠归属报告 `city_ownership`
+5. 关羽卒后仍参与事件：严格模式 error，叙事模式且有演义来源则为 warning
 
 ## 测试
 
@@ -64,4 +65,4 @@ pytest -q
 
 ## 当前阶段不做
 
-跨实体校验引擎、项目导入导出、React 界面、战斗结算、3D 预览。
+项目导入导出、React 界面、战斗结算、独立时间线/任务模块。

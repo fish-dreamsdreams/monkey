@@ -34,6 +34,7 @@ async def test_health_and_meta(client: AsyncClient) -> None:
     assert any(item["code"] == "dialogue" for item in body["story_node_types"])
     assert any(item["code"] == "portrait" for item in body["resource_types"])
     assert any(item["code"] == "gltf" for item in body["mesh_formats"])
+    assert any(item["code"] == "strict_historical" for item in body["validation_modes"])
     assert any(item["code"] == "leader" for item in body["member_roles"])
     assert any(item["code"] == "water" for item in body["terrain_types"])
     assert any(item["code"] == "river" for item in body["map_feature_types"])

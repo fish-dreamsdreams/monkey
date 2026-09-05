@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanguo-editor.local/schema/validation.schema.json",
+  "title": "ValidationReport",
+  "description": "跨实体校验报告。schema_version=1.10.0。valid 仅在没有 error 时为 true。导出前必须 valid。",
+  "type": "object",
+  "required": ["schema_version", "mode", "valid", "issues"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.10.0" },
+    "mode": { "enum": ["strict_historical", "game_narrative"] },
+    "valid": { "type": "boolean" },
+    "error_count": { "type": "integer", "minimum": 0 },
+    "warning_count": { "type": "integer", "minimum": 0 },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule", "severity", "message", "entity_type"],
+        "properties": {
+          "rule": { "type": "string" },
+          "severity": { "enum": ["error", "warning"] },
+          "message": { "type": "string" },
+          "entity_type": { "type": "string" },
+          "entity_id": { "type": ["string", "null"] },
+          "field": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

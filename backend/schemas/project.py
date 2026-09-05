@@ -75,3 +75,4 @@ class EditorMetaRead(BaseModel):
     story_action_types: list[TypeMeta]
     resource_types: list[TypeMeta]
     mesh_formats: list[TypeMeta]
+    validation_modes: list[TypeMeta]

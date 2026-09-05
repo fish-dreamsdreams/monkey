@@ -54,6 +54,26 @@ def valid_character_skill_id(binding_id: str) -> str:
     return require_id(binding_id, EntityPrefix.CHARACTER_SKILL, field="binding_id")
 
 
+def valid_city_id(city_id: str) -> str:
+    """校验路径参数 city_id。"""
+    return require_id(city_id, EntityPrefix.CITY, field="city_id")
+
+
+def valid_faction_id(faction_id: str) -> str:
+    """校验路径参数 faction_id。"""
+    return require_id(faction_id, EntityPrefix.FACTION, field="faction_id")
+
+
+def valid_faction_member_id(member_id: str) -> str:
+    """校验路径参数 member_id。"""
+    return require_id(member_id, EntityPrefix.FACTION_MEMBER, field="member_id")
+
+
+def valid_faction_territory_id(territory_id: str) -> str:
+    """校验路径参数 territory_id。"""
+    return require_id(territory_id, EntityPrefix.FACTION_TERRITORY, field="territory_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

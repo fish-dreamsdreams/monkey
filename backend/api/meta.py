@@ -10,6 +10,7 @@ from backend.domain.relationship_types import (
     RelationshipType,
     is_symmetric,
 )
+from backend.domain.faction_rules import FACTION_MEMBER_ROLE_LABELS_ZH, FactionMemberRole
 from backend.domain.skill_rules import (
     EFFECT_TYPE_LABELS_ZH,
     SKILL_TYPE_LABELS_ZH,
@@ -19,6 +20,7 @@ from backend.domain.skill_rules import (
 from backend.domain.source_types import SOURCE_TYPE_LABELS_ZH, SourceType, is_fact_eligible
 from backend.schemas.common import ApiResponse
 from backend.schemas.project import EditorMetaRead
+from backend.schemas.faction import MemberRoleMeta
 from backend.schemas.relationship import RelationshipTypeMeta
 from backend.schemas.skill import SkillTypeMeta
 from backend.schemas.source import SourceTypeMeta
@@ -56,6 +58,10 @@ async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
         ],
         effect_types=[
             SkillTypeMeta(code=item.value, name_zh=EFFECT_TYPE_LABELS_ZH[item]) for item in SkillEffectType
+        ],
+        member_roles=[
+            MemberRoleMeta(code=item.value, name_zh=FACTION_MEMBER_ROLE_LABELS_ZH[item])
+            for item in FactionMemberRole
         ],
     )
     return ApiResponse(data=data)

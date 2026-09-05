@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.schemas.faction import MemberRoleMeta
 from backend.schemas.relationship import RelationshipTypeMeta
 from backend.schemas.skill import SkillTypeMeta
 from backend.schemas.source import SourceTypeMeta
@@ -62,3 +63,4 @@ class EditorMetaRead(BaseModel):
     relationship_types: list[RelationshipTypeMeta]
     skill_types: list[SkillTypeMeta]
     effect_types: list[SkillTypeMeta]
+    member_roles: list[MemberRoleMeta]

@@ -27,6 +27,10 @@ class EntityPrefix(str, Enum):
     RELATIONSHIP = "rel"
     SKILL = "skl"
     CHARACTER_SKILL = "csk"
+    CITY = "cty"
+    FACTION = "fac"
+    FACTION_MEMBER = "fmb"
+    FACTION_TERRITORY = "ftr"
 
 
 def new_id(prefix: EntityPrefix) -> str:

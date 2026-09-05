@@ -3,6 +3,8 @@
 from fastapi import APIRouter
 
 from backend.api.characters import router as characters_router
+from backend.api.cities import router as cities_router
+from backend.api.factions import router as factions_router
 from backend.api.meta import router as meta_router
 from backend.api.projects import router as projects_router
 from backend.api.relationships import router as relationships_router
@@ -15,4 +17,6 @@ api_router.include_router(projects_router)
 api_router.include_router(sources_router)
 api_router.include_router(relationships_router)
 api_router.include_router(skills_router)
+api_router.include_router(cities_router)
+api_router.include_router(factions_router)
 api_router.include_router(characters_router)

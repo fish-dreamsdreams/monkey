@@ -34,5 +34,5 @@ def test_cli_parses_db_commands() -> None:
     assert args.db_command == "check"
 
 
-def test_alembic_script_head_is_phase5() -> None:
-    assert script_head_revision() == "0005_phase5"
+def test_alembic_script_head_is_phase6() -> None:
+    assert script_head_revision() == "0006_phase6"

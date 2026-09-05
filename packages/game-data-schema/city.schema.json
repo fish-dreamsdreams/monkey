@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanguo-editor.local/schema/city.schema.json",
+  "title": "CityExport",
+  "description": "城池导出契约。schema_version=1.5.0。owner 不入库，由某年领土记录派生。",
+  "type": "object",
+  "required": ["schema_version", "id", "code", "name"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.5.0" },
+    "id": { "type": "string" },
+    "code": { "type": "string" },
+    "name": { "type": "string" },
+    "coord_x": { "type": ["integer", "null"] },
+    "coord_y": { "type": ["integer", "null"] },
+    "historical": {
+      "type": "object",
+      "properties": {
+        "historical_name": { "type": ["string", "null"] },
+        "founded_year": { "type": ["integer", "null"] },
+        "destroyed_year": { "type": ["integer", "null"] },
+        "description": { "type": ["string", "null"] }
+      }
+    },
+    "game": {
+      "type": "object",
+      "properties": {
+        "population": { "type": "integer", "minimum": 0 },
+        "military": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "economy": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "defense": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    }
+  }
+}

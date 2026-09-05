@@ -2,6 +2,8 @@
 
 from backend.models.base import Base
 from backend.models.character import Character, CharacterAttribute, CharacterHistoricalRecord
+from backend.models.city import City
+from backend.models.faction import Faction, FactionMember, FactionTerritory
 from backend.models.personality import CharacterPersonality, PersonalityTag
 from backend.models.project import Project
 from backend.models.relationship import CharacterRelationship
@@ -21,4 +23,8 @@ __all__ = [
     "CharacterRelationship",
     "Skill",
     "CharacterSkill",
+    "City",
+    "Faction",
+    "FactionMember",
+    "FactionTerritory",
 ]

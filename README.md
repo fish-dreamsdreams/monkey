@@ -1,6 +1,6 @@
 # 三国游戏内容编辑器
 
-Phase 2：公共基础设施（Alembic CLI、统一错误、ID 规则、项目上下文）。
+Phase 3：人物史料来源（正史 / 演义 / 游戏设定分层）。
 
 编辑器只负责创建、编辑、校验、保存内容数据。战斗、AI、动画留给未来游戏客户端。
 
@@ -8,10 +8,11 @@ Phase 2：公共基础设施（Alembic CLI、统一错误、ID 规则、项目�
 
 - 工作库：MySQL 8（SQLAlchemy 2 异步）
 - 人物分栏：`base` 身份、`historical` 史实、`game` 游戏数值
-- 主键带类型前缀：`prj_` / `chr_` / `tag_` ；业务 `code` 另计（如 `chr_liu_bei`、`han_end`）
-- 所有内容 API 先解析项目上下文：ID 格式 → 项目存在 → schema 兼容
+- 史料目录按项目预置：`三国志`（正史）、`三国演义`（文学演义）等
+- 引文必须声明 `bound_layer`：`historical` | `literary` | `game`
+- 《三国演义》不能挂到 `historical` 层，也不能登记为正史
+- 主键前缀：`prj_` / `chr_` / `tag_` / `src_` / `cit_`
 - 错误响应统一为 `{ data, error, meta }`
-- 导出契约：`packages/game-data-schema/character.schema.json`
 
 ## 环境要求
 
@@ -27,12 +28,6 @@ docker compose up -d mysql
 copy .env.example .env
 ```
 
-手动创建数据库时请使用 `utf8mb4`：
-
-```sql
-CREATE DATABASE sanguo_editor CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
 ## 安装与迁移
 
 ```powershell
@@ -40,11 +35,8 @@ py -3 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 python -m backend.cli db upgrade
-python -m backend.cli db current
 python -m backend.cli db check
 ```
-
-等价写法：`.\scripts\db.ps1 upgrade`
 
 不要在应用启动时自动 migrate。先 `upgrade` 再启动 API。
 
@@ -60,12 +52,12 @@ uvicorn backend.main:app --reload --port 8000
 
 ## 验证
 
-1. `GET /api/v1/meta` 中 `schema_version` 为 `1.1.0`，`alembic_script_head` 为 `0002_phase2`
-2. `POST /api/v1/projects` 返回 `id` 以 `prj_` 开头，可带 `code`
-3. `GET /api/v1/projects/not-a-valid-id` 返回 400 / `invalid_id`
-4. `PUT /api/v1/projects/{id}` 可改名称，不能改 code
-5. 创建人物后 `id` 以 `chr_` 开头
-6. `birth_year > death_year` 应 400；重复人物 code 应 409
+1. `GET /api/v1/meta` 中 `schema_version` 为 `1.2.0`，`alembic_script_head` 为 `0003_phase3`
+2. 创建项目后 `GET /api/v1/projects/{id}/sources` 能看到 `sanguozhi` 与 `sanguoyanyi`
+3. 为刘备挂 `sanguozhi` + `historical` 成功
+4. 为刘备挂 `sanguoyanyi` + `historical` 返回 400
+5. 为刘备挂 `sanguoyanyi` + `literary` 成功
+6. 新增来源名为「三国演义…」且类型为正史，返回 400
 
 ## 测试
 

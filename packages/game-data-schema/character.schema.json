@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sanguo-editor.local/schema/character.schema.json",
   "title": "CharacterExport",
-  "description": "Phase 1 人物导出契约。schema_version=1.0.0。客户端只读此结构，不连接编辑器数据库。",
+  "description": "人物导出契约。schema_version=1.2.0。客户端只读此结构，不连接编辑器数据库。演义引文不得写入 historical。",
   "type": "object",
   "required": ["schema_version", "id", "code", "base", "historical", "game"],
   "properties": {
-    "schema_version": { "type": "string", "const": "1.0.0" },
+    "schema_version": { "type": "string", "const": "1.2.0" },
     "id": { "type": "string" },
     "code": { "type": "string" },
     "base": {
@@ -25,7 +25,7 @@
     },
     "historical": {
       "type": "object",
-      "description": "历史事实，禁止写入游戏数值",
+      "description": "历史事实，禁止写入游戏数值，也禁止写入三国演义情节",
       "properties": {
         "biography": { "type": ["string", "null"] },
         "family_background": { "type": ["string", "null"] },
@@ -49,6 +49,34 @@
         "personality_tag_codes": {
           "type": "array",
           "items": { "type": "string" }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "description": "人物引文。bound_layer=historical 的条目必须来自正史/史书/论文/学术资料。",
+      "items": {
+        "type": "object",
+        "required": ["source_code", "source_type", "bound_layer"],
+        "properties": {
+          "source_code": { "type": "string" },
+          "source_name": { "type": "string" },
+          "source_type": {
+            "enum": [
+              "official_history",
+              "historical_book",
+              "paper",
+              "academic",
+              "tradition",
+              "folklore",
+              "literary",
+              "game_setting"
+            ]
+          },
+          "bound_layer": { "enum": ["historical", "literary", "game"] },
+          "quotation": { "type": ["string", "null"] },
+          "reference": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] }
         }
       }
     }

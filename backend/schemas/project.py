@@ -4,6 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.schemas.source import SourceTypeMeta
+
 
 class ProjectCreate(BaseModel):
     """创建内容项目。code 可省略，服务端会生成。"""
@@ -54,3 +56,4 @@ class EditorMetaRead(BaseModel):
     supported_schema_versions: list[str]
     alembic_script_head: str
     id_prefixes: dict[str, str]
+    source_types: list[SourceTypeMeta]

@@ -9,9 +9,12 @@ from backend.core.ids import EntityPrefix, new_business_code, new_id
 from backend.core.schema_version import CURRENT_SCHEMA_VERSION
 from backend.domain.character_rules import validate_historical_year_range
 from backend.domain.personality import SYSTEM_PERSONALITY_TAGS
+from backend.domain.source_types import SYSTEM_SOURCES
 from backend.models.personality import PersonalityTag
 from backend.models.project import Project
+from backend.models.source import Source
 from backend.repositories.project_repository import ProjectRepository
+from backend.repositories.source_repository import SourceRepository
 from backend.schemas.personality import PersonalityTagCreate
 from backend.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
 
@@ -19,11 +22,12 @@ from backend.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
 class ProjectService:
     """项目用例编排。"""
 
-    def __init__(self, projects: ProjectRepository) -> None:
+    def __init__(self, projects: ProjectRepository, sources: SourceRepository) -> None:
         self._projects = projects
+        self._sources = sources
 
     async def create(self, payload: ProjectCreate) -> ProjectRead:
-        """创建项目并初始化系统性格标签。"""
+        """创建项目并初始化系统性格标签与史料目录。"""
         validate_historical_year_range(payload.target_start_year, payload.target_end_year)
         code = payload.code or new_business_code("proj")
         if await self._projects.get_by_code(code) is not None:
@@ -48,11 +52,24 @@ class ProjectService:
                 project_id=project.id,
                 code=tag_code,
                 name=name,
+                description=description,
                 is_system=True,
             )
-            for tag_code, name in SYSTEM_PERSONALITY_TAGS
+            for tag_code, name, description in SYSTEM_PERSONALITY_TAGS
         ]
         await self._projects.add_tags(tags)
+        catalog = [
+            Source(
+                id=new_id(EntityPrefix.SOURCE),
+                project_id=project.id,
+                code=code,
+                name=name,
+                source_type=source_type.value,
+                is_system=True,
+            )
+            for code, name, source_type in SYSTEM_SOURCES
+        ]
+        await self._sources.add_many(catalog)
         return ProjectRead.model_validate(project)
 
     async def get(self, project_id: str) -> ProjectRead:
@@ -92,6 +109,7 @@ class ProjectService:
             project_id=project_id,
             code=payload.code,
             name=payload.name.strip(),
+            description=payload.description,
             is_system=False,
         )
         await self._projects.add_tags([tag])

@@ -5,6 +5,8 @@ from enum import Enum
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.schemas.source import CharacterSourceRead, CharacterSourceWrite
+
 
 class Gender(str, Enum):
     """性别。未知用于史料不足的情况。"""
@@ -59,19 +61,21 @@ class CharacterGameData(BaseModel):
 
 
 class CharacterCreate(BaseModel):
-    """创建人物：基础信息 + 历史事实 + 游戏设定。"""
+    """创建人物：基础信息 + 历史事实 + 游戏设定 + 可选引文。"""
 
     base: CharacterBaseInfo
     historical: CharacterHistoricalData = Field(default_factory=CharacterHistoricalData)
     game: CharacterGameData = Field(default_factory=CharacterGameData)
+    sources: list[CharacterSourceWrite] = Field(default_factory=list)
 
 
 class CharacterUpdate(BaseModel):
-    """全量更新人物。历史栏与游戏栏仍然分离。"""
+    """全量更新人物。sources 为 None 时保留原引文。"""
 
     base: CharacterBaseInfo
     historical: CharacterHistoricalData = Field(default_factory=CharacterHistoricalData)
     game: CharacterGameData = Field(default_factory=CharacterGameData)
+    sources: list[CharacterSourceWrite] | None = None
 
 
 class PersonalityTagRead(BaseModel):
@@ -80,9 +84,16 @@ class PersonalityTagRead(BaseModel):
     id: str
     code: str
     name: str
+    description: str | None = None
     is_system: bool
 
     model_config = {"from_attributes": True}
+
+
+class CharacterPersonalityRead(PersonalityTagRead):
+    """人物上的性格绑定，含强度 1-5。"""
+
+    intensity: int = 3
 
 
 class CharacterSummary(BaseModel):
@@ -99,13 +110,14 @@ class CharacterSummary(BaseModel):
 
 
 class CharacterRead(BaseModel):
-    """人物详情，历史与游戏分栏返回。"""
+    """人物详情，历史与游戏分栏返回，并附带引文。"""
 
     id: str
     project_id: str
     base: CharacterBaseInfo
     historical: CharacterHistoricalData
     game: CharacterGameData
-    personalities: list[PersonalityTagRead]
+    personalities: list[CharacterPersonalityRead]
+    sources: list[CharacterSourceRead]
     created_at: datetime
     updated_at: datetime

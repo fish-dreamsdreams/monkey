@@ -2,10 +2,16 @@
 
 from fastapi import APIRouter, Depends, Query, status
 
-from backend.api.context import ProjectContext, get_project_context, valid_character_id
+from backend.api.context import (
+    ProjectContext,
+    get_project_context,
+    valid_character_id,
+    valid_citation_id,
+)
 from backend.api.deps import get_character_service
 from backend.schemas.character import CharacterCreate, CharacterRead, CharacterSummary, CharacterUpdate
 from backend.schemas.common import ApiResponse
+from backend.schemas.source import CharacterSourceRead, CharacterSourceWrite
 from backend.services.character_service import CharacterService
 
 router = APIRouter(prefix="/projects/{project_id}/characters", tags=["characters"])
@@ -65,4 +71,28 @@ async def delete_character(
 ) -> ApiResponse[None]:
     """删除人物。"""
     await service.delete(ctx.id, character_id)
+    return ApiResponse(data=None, meta={"deleted": True})
+
+
+@router.post("/{character_id}/sources", status_code=status.HTTP_201_CREATED)
+async def add_character_source(
+    payload: CharacterSourceWrite,
+    ctx: ProjectContext = Depends(get_project_context),
+    character_id: str = Depends(valid_character_id),
+    service: CharacterService = Depends(get_character_service),
+) -> ApiResponse[CharacterSourceRead]:
+    """为人物追加引文。演义不得挂到 historical 层。"""
+    data = await service.add_citation(ctx.id, character_id, payload)
+    return ApiResponse(data=data)
+
+
+@router.delete("/{character_id}/sources/{citation_id}", status_code=status.HTTP_200_OK)
+async def delete_character_source(
+    ctx: ProjectContext = Depends(get_project_context),
+    character_id: str = Depends(valid_character_id),
+    citation_id: str = Depends(valid_citation_id),
+    service: CharacterService = Depends(get_character_service),
+) -> ApiResponse[None]:
+    """删除人物引文。"""
+    await service.delete_citation(ctx.id, character_id, citation_id)
     return ApiResponse(data=None, meta={"deleted": True})

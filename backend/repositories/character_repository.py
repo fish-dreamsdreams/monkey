@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 
 from backend.models.character import Character
 from backend.models.personality import CharacterPersonality
+from backend.models.source import CharacterSource
 
 
 class CharacterRepository:
@@ -22,6 +23,7 @@ class CharacterRepository:
             selectinload(Character.historical_record),
             selectinload(Character.attributes),
             selectinload(Character.personalities).selectinload(CharacterPersonality.tag),
+            selectinload(Character.citations).selectinload(CharacterSource.source),
         )
 
     async def add(self, character: Character) -> Character:

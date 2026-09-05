@@ -8,6 +8,7 @@ class PersonalityTagCreate(BaseModel):
 
     code: str = Field(min_length=2, max_length=64, pattern=r"^[a-z][a-z0-9_]*$")
     name: str = Field(min_length=1, max_length=50)
+    description: str | None = Field(default=None, max_length=200)
 
     @field_validator("code")
     @classmethod

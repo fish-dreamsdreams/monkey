@@ -17,9 +17,11 @@ async def test_health_and_meta(client: AsyncClient) -> None:
     assert meta.status_code == 200
     body = meta.json()["data"]
     assert body["schema_version"] == CURRENT_SCHEMA_VERSION
-    assert body["alembic_script_head"] == "0002_phase2"
+    assert body["alembic_script_head"] == "0003_phase3"
     assert body["id_prefixes"]["project"] == "prj"
     assert body["id_prefixes"]["character"] == "chr"
+    assert body["id_prefixes"]["source"] == "src"
+    assert any(item["code"] == "literary" and item["fact_eligible"] is False for item in body["source_types"])
 
 
 @pytest.mark.asyncio

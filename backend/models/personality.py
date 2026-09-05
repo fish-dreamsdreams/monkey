@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, ForeignKey, String, UniqueConstraint
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.models.base import Base
@@ -27,6 +27,7 @@ class PersonalityTag(Base):
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
     code: Mapped[str] = mapped_column(String(64), nullable=False)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_system: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     project: Mapped[Project] = relationship(back_populates="personality_tags")
@@ -46,6 +47,7 @@ class CharacterPersonality(Base):
         ForeignKey("personality_tags.id", ondelete="CASCADE"),
         primary_key=True,
     )
+    intensity: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
 
     character: Mapped[Character] = relationship(back_populates="personalities")
     tag: Mapped[PersonalityTag] = relationship(back_populates="bindings")

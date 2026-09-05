@@ -1,16 +1,16 @@
 """预置性格标签。
 
-职责：提供可扩展的系统性格代码，不把性格写死为一段描述文本。
+职责：提供可扩展的系统性格代码与简述，不把性格写死为一段自由文本。
 """
 
-SYSTEM_PERSONALITY_TAGS: tuple[tuple[str, str], ...] = (
-    ("brave", "勇猛"),
-    ("cautious", "谨慎"),
-    ("suspicious", "多疑"),
-    ("loyal", "忠诚"),
-    ("decisive", "果断"),
-    ("benevolent", "仁厚"),
-    ("cunning", "狡诈"),
-    ("ambitious", "野心"),
-    ("calm", "冷静"),
+SYSTEM_PERSONALITY_TAGS: tuple[tuple[str, str, str], ...] = (
+    ("brave", "勇猛", "临阵敢进，不避锋镝"),
+    ("cautious", "谨慎", "行事稳妥，先计后动"),
+    ("suspicious", "多疑", "对人与局势常存戒心"),
+    ("loyal", "忠诚", "重恩义，不易改事他主"),
+    ("decisive", "果断", "能迅速决断并执行"),
+    ("benevolent", "仁厚", "待人宽厚，能收士心"),
+    ("cunning", "狡诈", "善权谋，不拘常法"),
+    ("ambitious", "野心", "有扩张权势的强烈意愿"),
+    ("calm", "冷静", "危局中仍能保持理智"),
 )

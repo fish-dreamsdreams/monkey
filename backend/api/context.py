@@ -34,6 +34,11 @@ def valid_character_id(character_id: str) -> str:
     return require_id(character_id, EntityPrefix.CHARACTER, field="character_id")
 
 
+def valid_citation_id(citation_id: str) -> str:
+    """校验路径参数 citation_id。"""
+    return require_id(citation_id, EntityPrefix.CITATION, field="citation_id")
+
+
 async def get_project_context(
     project_id: str = Depends(valid_project_id),
     session: AsyncSession = Depends(get_db),

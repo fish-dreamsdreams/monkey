@@ -8,29 +8,39 @@ from backend.core.clock import utc_now
 from backend.core.exceptions import ConflictError, NotFoundError, ValidationError
 from backend.core.ids import EntityPrefix, new_id
 from backend.domain.character_rules import validate_lifespan
+from backend.domain.source_types import BoundLayer, SourceType, is_fact_eligible, validate_citation_layer
 from backend.models.character import Character, CharacterAttribute, CharacterHistoricalRecord
 from backend.models.personality import CharacterPersonality, PersonalityTag
+from backend.models.source import CharacterSource, Source
 from backend.repositories.character_repository import CharacterRepository
 from backend.repositories.project_repository import ProjectRepository
+from backend.repositories.source_repository import SourceRepository
 from backend.schemas.character import (
     CharacterBaseInfo,
     CharacterCreate,
     CharacterGameData,
     CharacterHistoricalData,
+    CharacterPersonalityRead,
     CharacterRead,
     CharacterSummary,
     CharacterUpdate,
     Gender,
-    PersonalityTagRead,
 )
+from backend.schemas.source import CharacterSourceRead, CharacterSourceWrite
 
 
 class CharacterService:
     """人物用例编排。"""
 
-    def __init__(self, characters: CharacterRepository, projects: ProjectRepository) -> None:
+    def __init__(
+        self,
+        characters: CharacterRepository,
+        projects: ProjectRepository,
+        sources: SourceRepository,
+    ) -> None:
         self._characters = characters
         self._projects = projects
+        self._sources = sources
 
     async def create(self, project_id: str, payload: CharacterCreate) -> CharacterRead:
         """创建人物，分别写入历史事实与游戏设定。"""
@@ -59,8 +69,10 @@ class CharacterService:
         character.historical_record = self._build_historical(character.id, payload.historical)
         character.attributes = [self._build_attributes(character.id, payload.game)]
         character.personalities = [
-            CharacterPersonality(character_id=character.id, personality_tag_id=tag.id) for tag in tags
+            CharacterPersonality(character_id=character.id, personality_tag_id=tag.id, intensity=3)
+            for tag in tags
         ]
+        character.citations = await self._build_citations(project_id, character.id, payload.sources)
         await self._characters.add(character)
         project = await self._projects.get(project_id)
         if project is not None:
@@ -140,8 +152,13 @@ class CharacterService:
         character.personalities.clear()
         await self._characters.flush()
         character.personalities = [
-            CharacterPersonality(character_id=character.id, personality_tag_id=tag.id) for tag in tags
+            CharacterPersonality(character_id=character.id, personality_tag_id=tag.id, intensity=3)
+            for tag in tags
         ]
+        if payload.sources is not None:
+            character.citations.clear()
+            await self._characters.flush()
+            character.citations = await self._build_citations(project_id, character.id, payload.sources)
 
         project = await self._projects.get(project_id)
         if project is not None:
@@ -167,6 +184,90 @@ class CharacterService:
         project = await self._projects.get(project_id)
         if project is None:
             raise NotFoundError("项目不存在")
+
+    async def add_citation(
+        self,
+        project_id: str,
+        character_id: str,
+        payload: CharacterSourceWrite,
+    ) -> CharacterSourceRead:
+        """为已有人物追加一条引文。"""
+        character = await self._require_character(project_id, character_id)
+        citations = await self._build_citations(project_id, character.id, [payload])
+        saved = await self._sources.add_citation(citations[0])
+        project = await self._projects.get(project_id)
+        if project is not None:
+            await self._projects.bump_content_version(project)
+        return self._to_citation_read(saved)
+
+    async def delete_citation(self, project_id: str, character_id: str, citation_id: str) -> None:
+        """删除人物引文。"""
+        await self._require_character(project_id, character_id)
+        citation = await self._sources.get_citation(character_id, citation_id)
+        if citation is None:
+            raise NotFoundError("引文不存在")
+        await self._sources.delete_citation(citation)
+        project = await self._projects.get(project_id)
+        if project is not None:
+            await self._projects.bump_content_version(project)
+
+    async def _require_character(self, project_id: str, character_id: str) -> Character:
+        await self._require_project(project_id)
+        character = await self._characters.get(project_id, character_id)
+        if character is None:
+            raise NotFoundError("人物不存在")
+        return character
+
+    async def _build_citations(
+        self,
+        project_id: str,
+        character_id: str,
+        items: list[CharacterSourceWrite],
+    ) -> list[CharacterSource]:
+        catalog = await self._resolve_sources(project_id, [item.source_code for item in items])
+        citations: list[CharacterSource] = []
+        for item in items:
+            source = catalog[item.source_code]
+            source_type = SourceType(source.source_type)
+            validate_citation_layer(source_type, item.bound_layer)
+            citations.append(
+                CharacterSource(
+                    id=new_id(EntityPrefix.CITATION),
+                    character_id=character_id,
+                    source_id=source.id,
+                    bound_layer=item.bound_layer.value,
+                    quotation=item.quotation,
+                    reference=item.reference,
+                    note=item.note,
+                    source=source,
+                )
+            )
+        return citations
+
+    async def _resolve_sources(self, project_id: str, codes: list[str]) -> dict[str, Source]:
+        unique_codes = list(dict.fromkeys(codes))
+        sources = await self._sources.get_by_codes(project_id, unique_codes)
+        found = {item.code: item for item in sources}
+        missing = [code for code in unique_codes if code not in found]
+        if missing:
+            raise ValidationError(f"来源不存在: {', '.join(missing)}", field="source_code")
+        return found
+
+    def _to_citation_read(self, citation: CharacterSource) -> CharacterSourceRead:
+        source = citation.source
+        source_type = SourceType(source.source_type)
+        return CharacterSourceRead(
+            id=citation.id,
+            source_id=source.id,
+            source_code=source.code,
+            source_name=source.name,
+            source_type=source_type,
+            bound_layer=BoundLayer(citation.bound_layer),
+            quotation=citation.quotation,
+            reference=citation.reference,
+            note=citation.note,
+            fact_eligible=is_fact_eligible(source_type),
+        )
 
     async def _resolve_tags(self, project_id: str, codes: list[str]) -> list[PersonalityTag]:
         unique_codes = list(dict.fromkeys(codes))
@@ -212,9 +313,19 @@ class CharacterService:
         historical = character.historical_record
         attr = next(iter(character.attributes), None)
         personalities = [
-            PersonalityTagRead.model_validate(binding.tag)
+            CharacterPersonalityRead(
+                id=binding.tag.id,
+                code=binding.tag.code,
+                name=binding.tag.name,
+                description=binding.tag.description,
+                is_system=binding.tag.is_system,
+                intensity=binding.intensity,
+            )
             for binding in character.personalities
             if binding.tag is not None
+        ]
+        citations = [
+            self._to_citation_read(item) for item in character.citations if item.source is not None
         ]
         return CharacterRead(
             id=character.id,
@@ -250,6 +361,7 @@ class CharacterService:
                 attribute_version=attr.version_name if attr else "default",
             ),
             personalities=personalities,
+            sources=citations,
             created_at=character.created_at,
             updated_at=character.updated_at,
         )

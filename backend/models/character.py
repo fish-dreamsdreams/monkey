@@ -16,6 +16,7 @@ from backend.models.base import Base
 if TYPE_CHECKING:
     from backend.models.personality import CharacterPersonality
     from backend.models.project import Project
+    from backend.models.source import CharacterSource
 
 
 class Character(Base):
@@ -54,6 +55,10 @@ class Character(Base):
         cascade="all, delete-orphan",
     )
     personalities: Mapped[list[CharacterPersonality]] = relationship(
+        back_populates="character",
+        cascade="all, delete-orphan",
+    )
+    citations: Mapped[list[CharacterSource]] = relationship(
         back_populates="character",
         cascade="all, delete-orphan",
     )

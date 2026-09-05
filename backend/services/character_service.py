@@ -6,7 +6,7 @@
 
 from backend.core.clock import utc_now
 from backend.core.exceptions import ConflictError, NotFoundError, ValidationError
-from backend.core.ids import new_id
+from backend.core.ids import EntityPrefix, new_id
 from backend.domain.character_rules import validate_lifespan
 from backend.models.character import Character, CharacterAttribute, CharacterHistoricalRecord
 from backend.models.personality import CharacterPersonality, PersonalityTag
@@ -42,7 +42,7 @@ class CharacterService:
         tags = await self._resolve_tags(project_id, payload.game.personality_tag_codes)
         now = utc_now()
         character = Character(
-            id=new_id(),
+            id=new_id(EntityPrefix.CHARACTER),
             project_id=project_id,
             code=payload.base.code,
             name=payload.base.name.strip(),
@@ -178,7 +178,7 @@ class CharacterService:
         return tags
 
     def _build_historical(self, character_id: str, data: CharacterHistoricalData) -> CharacterHistoricalRecord:
-        record = CharacterHistoricalRecord(id=new_id(), character_id=character_id)
+        record = CharacterHistoricalRecord(id=new_id(EntityPrefix.HISTORICAL_RECORD), character_id=character_id)
         self._apply_historical(record, data)
         return record
 
@@ -191,7 +191,7 @@ class CharacterService:
 
     def _build_attributes(self, character_id: str, data: CharacterGameData) -> CharacterAttribute:
         attr = CharacterAttribute(
-            id=new_id(),
+            id=new_id(EntityPrefix.ATTRIBUTE),
             character_id=character_id,
             version_name=data.attribute_version,
         )

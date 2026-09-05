@@ -6,6 +6,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.core.clock import utc_now
+
 from backend.models.personality import PersonalityTag
 from backend.models.project import Project
 
@@ -25,6 +27,11 @@ class ProjectRepository:
     async def get(self, project_id: str) -> Project | None:
         """按 ID 查询项目。"""
         return await self._session.get(Project, project_id)
+
+    async def get_by_code(self, code: str) -> Project | None:
+        """按业务 code 查询项目。"""
+        result = await self._session.execute(select(Project).where(Project.code == code))
+        return result.scalar_one_or_none()
 
     async def list_all(self) -> list[Project]:
         """列出全部项目。"""
@@ -70,4 +77,5 @@ class ProjectRepository:
     async def bump_content_version(self, project: Project) -> None:
         """内容变更后递增项目内容版本。"""
         project.content_version += 1
+        project.updated_at = utc_now()
         await self._session.flush()

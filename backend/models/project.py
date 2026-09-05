@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Integer, String, Text, func
+from sqlalchemy import DateTime, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.models.base import Base
@@ -22,11 +22,13 @@ class Project(Base):
     """内容项目。"""
 
     __tablename__ = "projects"
+    __table_args__ = (UniqueConstraint("code", name="uq_projects_code"),)
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    code: Mapped[str] = mapped_column(String(64), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.0.0")
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.1.0")
     content_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     target_start_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     target_end_year: Mapped[int | None] = mapped_column(Integer, nullable=True)

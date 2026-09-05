@@ -48,6 +48,7 @@ async def test_create_and_get_character_splits_historical_and_game(client: Async
     created = await client.post(f"/api/v1/projects/{project_id}/characters", json=LIU_BEI)
     assert created.status_code == 201
     body = created.json()["data"]
+    assert body["id"].startswith("chr_")
     assert body["base"]["name"] == "刘备"
     assert body["base"]["courtesy_name"] == "玄德"
     assert "force" not in body["historical"]
@@ -119,6 +120,14 @@ async def test_unknown_personality_tag_is_rejected(client: AsyncClient) -> None:
     }
     response = await client.post(f"/api/v1/projects/{project_id}/characters", json=payload)
     assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_invalid_character_id_returns_400(client: AsyncClient) -> None:
+    project_id = await _create_project(client)
+    response = await client.get(f"/api/v1/projects/{project_id}/characters/bad-id")
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "invalid_id"
 
 
 @pytest.mark.asyncio

@@ -1,6 +1,6 @@
 # 三国游戏内容编辑器
 
-Phase 1：项目初始化 + MySQL + SQLAlchemy + Pydantic + 人物管理。
+Phase 2：公共基础设施（Alembic CLI、统一错误、ID 规则、项目上下文）。
 
 编辑器只负责创建、编辑、校验、保存内容数据。战斗、AI、动画留给未来游戏客户端。
 
@@ -8,7 +8,9 @@ Phase 1：项目初始化 + MySQL + SQLAlchemy + Pydantic + 人物管理。
 
 - 工作库：MySQL 8（SQLAlchemy 2 异步）
 - 人物分栏：`base` 身份、`historical` 史实、`game` 游戏数值
-- 性格为结构化标签，不是一段文本
+- 主键带类型前缀：`prj_` / `chr_` / `tag_` ；业务 `code` 另计（如 `chr_liu_bei`、`han_end`）
+- 所有内容 API 先解析项目上下文：ID 格式 → 项目存在 → schema 兼容
+- 错误响应统一为 `{ data, error, meta }`
 - 导出契约：`packages/game-data-schema/character.schema.json`
 
 ## 环境要求
@@ -37,8 +39,14 @@ CREATE DATABASE sanguo_editor CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 py -3 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
-alembic upgrade head
+python -m backend.cli db upgrade
+python -m backend.cli db current
+python -m backend.cli db check
 ```
+
+等价写法：`.\scripts\db.ps1 upgrade`
+
+不要在应用启动时自动 migrate。先 `upgrade` 再启动 API。
 
 ## 运行 API
 
@@ -48,41 +56,16 @@ uvicorn backend.main:app --reload --port 8000
 
 打开 Swagger：http://127.0.0.1:8000/docs
 
-## 验证人物功能
+元信息：`GET /api/v1/meta`、`GET /health`
 
-1. `POST /api/v1/projects` 创建项目（会写入 9 个系统性格标签）
-2. `GET /api/v1/projects/{id}/personality-tags` 查看性格
-3. `POST /api/v1/projects/{id}/characters` 创建人物，body 必须分 `base` / `historical` / `game`
-4. 尝试 `birth_year > death_year`，应返回 400
-5. 重复 `code` 应返回 409
+## 验证
 
-刘备示例：
-
-```json
-{
-  "base": {
-    "code": "chr_liu_bei",
-    "name": "刘备",
-    "courtesy_name": "玄德",
-    "gender": "male",
-    "birth_year": 161,
-    "death_year": 223,
-    "birthplace": "涿郡涿县",
-    "identity": "蜀汉开国皇帝"
-  },
-  "historical": {
-    "biography": "东汉末年幽州涿郡人，蜀汉开国皇帝。"
-  },
-  "game": {
-    "force": 72,
-    "intelligence": 80,
-    "politics": 85,
-    "charisma": 95,
-    "leadership": 86,
-    "personality_tag_codes": ["benevolent", "ambitious"]
-  }
-}
-```
+1. `GET /api/v1/meta` 中 `schema_version` 为 `1.1.0`，`alembic_script_head` 为 `0002_phase2`
+2. `POST /api/v1/projects` 返回 `id` 以 `prj_` 开头，可带 `code`
+3. `GET /api/v1/projects/not-a-valid-id` 返回 400 / `invalid_id`
+4. `PUT /api/v1/projects/{id}` 可改名称，不能改 code
+5. 创建人物后 `id` 以 `chr_` 开头
+6. `birth_year > death_year` 应 400；重复人物 code 应 409
 
 ## 测试
 
@@ -90,8 +73,8 @@ uvicorn backend.main:app --reload --port 8000
 pytest -q
 ```
 
-测试使用内存 SQLite，不要求本机 MySQL 正在运行。
+测试使用内存 SQLite，不要求本机 MySQL 正在运行。`db upgrade` 仍需要 MySQL。
 
-## Phase 1 不做
+## 当前阶段不做
 
 人物关系、技能、城池、势力、地图、事件、剧情、资源管理、完整导入导出、React 界面。

@@ -9,8 +9,10 @@ async def test_create_project_seeds_personality_tags(client: AsyncClient) -> Non
     created = await client.post("/api/v1/projects", json={"name": "东汉末年", "target_start_year": 184, "target_end_year": 280})
     assert created.status_code == 201
     project = created.json()["data"]
-    assert project["schema_version"] == "1.0.0"
+    assert project["schema_version"] == "1.1.0"
     assert project["content_version"] == 1
+    assert project["id"].startswith("prj_")
+    assert project["code"]
 
     tags = await client.get(f"/api/v1/projects/{project['id']}/personality-tags")
     assert tags.status_code == 200

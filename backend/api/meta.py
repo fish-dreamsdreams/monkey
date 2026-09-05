@@ -1,0 +1,24 @@
+"""编辑器元信息 API。"""
+
+from fastapi import APIRouter
+
+from backend.core.alembic_runtime import script_head_revision
+from backend.core.ids import EntityPrefix
+from backend.core.schema_version import API_VERSION, CURRENT_SCHEMA_VERSION, SUPPORTED_SCHEMA_VERSIONS
+from backend.schemas.common import ApiResponse
+from backend.schemas.project import EditorMetaRead
+
+router = APIRouter(tags=["meta"])
+
+
+@router.get("/meta")
+async def get_editor_meta() -> ApiResponse[EditorMetaRead]:
+    """返回当前编辑器 schema、ID 前缀与 Alembic 脚本 head。"""
+    data = EditorMetaRead(
+        api_version=API_VERSION,
+        schema_version=CURRENT_SCHEMA_VERSION,
+        supported_schema_versions=sorted(SUPPORTED_SCHEMA_VERSIONS),
+        alembic_script_head=script_head_revision(),
+        id_prefixes={item.name.lower(): item.value for item in EntityPrefix},
+    )
+    return ApiResponse(data=data)
